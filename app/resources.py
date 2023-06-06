@@ -86,10 +86,10 @@ def define_resources(app):
             etd_s3_bucket = etd_s3_resource.Bucket(etd_bucket_name)
 
             try:
-                etd_s3_bucket.Object().last_modified
+                etd_bucket_items = etd_s3_bucket.objects.all()
             except Exception as err:
                 result["num_failed"] += 1
-                result["tests_failed"].append("etd")
+                result["tests_failed"].append("etd_bucket")
                 result["Failed etd bucket"] = {"status_code": 500, "text": str(err) }
                 traceback.print_exc()
 
