@@ -5,26 +5,24 @@ version: '3.7'
 
 services:
 
-  jstor-integration-tests:
-    container_name: 'jstor-integration-tests'
+  etd-integration-tests:
+    container_name: 'etd-integration-tests'
     build:
       context: './'
       dockerfile: './DockerfileLocal'
     volumes:
-      - './:/home/jstorforumadm'
-      - '/tmp/harvested:/tmp/harvested'
-      - '/tmp/transformed:/tmp/transformed'
+      - './:/home/etdadm'
     env_file:
       - '.env'
     environment:
-      QUEUE_NAME: first_queue_itest
+      QUEUE_NAME: etd_submission_ready
     ports:
       # Integration tests
-      - '25003:8081'
+      - '10601:8081'
     networks:
-      - jstorforum-net
+      - etd-net
 
 # Create a custom docker network if it does not exist already
 networks:
-  jstorforum-net:
-    name: jstorforum-net
+  etd-net:
+    name: etd-net
