@@ -6,7 +6,7 @@ import celery as celeryapp
 import os
 
 incoming_queue = os.environ.get('FIRST_QUEUE_NAME', 'etd_submission_ready')
-completed_jstorforum_queue = os.environ.get('LAST_QUEUE_NAME', 'etd_in_storage')
+completed_etd_queue = os.environ.get('LAST_QUEUE_NAME', 'etd_in_storage')
 
 retry_strategy = Retry(
     total=3,
@@ -23,6 +23,6 @@ def do_task(message):
     response = celeryapp.execute.send_task("tasks.tasks.do_task", args=[message], kwargs={}, queue=incoming_queue)
     return response
 
-@celery.task(queue=completed_jstorforum_queue)
+@celery.task(queue=completed_etd_queue)
 def get_end_message(message):
     return message
