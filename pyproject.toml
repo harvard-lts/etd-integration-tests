@@ -1,0 +1,15 @@
+[project]
+name = "etd-integration-tests"
+version = "0.0.1"
+
+[tool.pytest.ini_options]
+pythonpath = [
+  ".", "app"
+]
+
+[tool.project-paths]
+dir_unit_out = "tests/unit/out/"
+dir_int_out = "tests/integration/out/"
+
+[tool.setuptools]
+packages = ["app"]
