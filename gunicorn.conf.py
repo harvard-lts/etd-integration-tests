@@ -37,8 +37,8 @@ pre_chain = [
 
 # Create a log folder for this container if it doesn't exist
 container_id = socket.gethostname()
-if not os.path.exists(f'/home/etdforumadm/logs/etd_itest/{container_id}'):
-    os.makedirs(f'/home/etdforumadm/logs/etd_itest/{container_id}')
+if not os.path.exists(f'/home/etdadm/logs/etd_itest/{container_id}'):
+    os.makedirs(f'/home/etdadm/logs/etd_itest/{container_id}')
 
 # Get timestamp
 timestamp = datetime.today().strftime('%Y-%m-%d')
@@ -58,13 +58,13 @@ logconfig_dict = {
         "error_console": {
             "class": "logging.FileHandler",
             "formatter": "json_formatter",
-            "filename": f"/home/etdforumadm/logs/etd_itest/{container_id}/error_console_{container_id}_{timestamp}.log",
+            "filename": f"/home/etdadm/logs/etd_itest/{container_id}/error_console_{container_id}_{timestamp}.log",
             "mode": "a"
         },
         "console": {
             "class": "logging.FileHandler",
             "formatter": "json_formatter",
-            "filename": f"/home/etdforumadm/logs/etd_itest/{container_id}/console_{container_id}_{timestamp}.log",
+            "filename": f"/home/etdadm/logs/etd_itest/{container_id}/console_{container_id}_{timestamp}.log",
             "mode": "a"
         }
     },
