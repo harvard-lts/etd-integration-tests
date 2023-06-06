@@ -1,5 +1,7 @@
 # etd-integration-tests
 
+<img src="https://github.com/harvard-lts/etd-integration-tests/actions/workflows/pytest.yml/badge.svg">
+
 ### To start component:
 - clone repository
 - cp .env.example to .env
