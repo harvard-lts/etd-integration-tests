@@ -94,7 +94,7 @@ def define_resources(app):
 
             try:
                 etd_bucket_items = etd_s3_bucket.objects.all()
-                len(etd_bucket_items)
+                list(etd_bucket_items)
             except Exception as err:
                 result["num_failed"] += 1
                 result["tests_failed"].append("etd_bucket")
