@@ -18,10 +18,15 @@ http_client = requests.Session()
 http_client.mount("https://", adapter)
 http_client.mount("http://", adapter)
 
+
 @celery.task(ignore_result=False, acks_late=True)
 def do_task(message):
-    response = celeryapp.execute.send_task("tasks.tasks.do_task", args=[message], kwargs={}, queue=incoming_queue)
+    response = celeryapp.execute.send_task("tasks.tasks.do_task",
+                                           args=[message],
+                                           kwargs={},
+                                           queue=incoming_queue)
     return response
+
 
 @celery.task(queue=completed_etd_queue)
 def get_end_message(message):
