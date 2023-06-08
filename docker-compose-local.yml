@@ -18,7 +18,7 @@ services:
       QUEUE_NAME: etd_submission_ready
     ports:
       # Integration tests
-      - '10601:8081'
+      - '10610:8081'
     networks:
       - etd-net
 
