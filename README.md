@@ -10,6 +10,6 @@
 - bring up docker
 - - docker-compose -f docker-compose-local.yml up --build -d --force-recreate --remove-orphans
 - start test by going to the browser at this url:
-- - https://localhost:10601/integration
+- - https://localhost:10610/integration
 - stop docker 
 - - docker-compose -f docker-compose-local.yml down
