@@ -6,5 +6,5 @@
 //  registryCredentialsId = "${env.REGISTRY_ID}"
 //  registryUri = 'https://registry.lts.harvard.edu'
 
-def endpoints = []
-ltsBasicPipeline.call("etd-integration-tests", "ETD", "etd", "10601", endpoints, "lts-etd-alerts")
+def endpoints = ["integration"]
+ltsBasicPipeline.call("etd-integration-tests", "ETD", "etd", "10610", endpoints, "lts-etd-alerts")
