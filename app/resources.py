@@ -1,6 +1,5 @@
 import time
-# import requests
-import traceback
+import requests
 from flask_restx import Resource, Api
 from flask import current_app
 import os
@@ -12,7 +11,6 @@ from pymongo import MongoClient
 # from celery import Celery
 from tasks.tasks import do_task
 import random
-import boto3
 
 
 incoming_queue = os.environ.get('FIRST_QUEUE_NAME', 'etd_submission_ready')
@@ -35,13 +33,9 @@ def define_resources(app):
     # mongo_ssl_cert = os.environ.get('MONGO_SSL_CERT')
     sleep_secs = int(os.environ.get('SLEEP_SECS', 2))
 
-    etd_access_key = os.environ.get('S3_ETD_ACCESS_KEY')
-    etd_sec_key = os.environ.get('S3_ETD_SECRET_KEY')
-    etd_bucket_name = os.environ.get('S3_ETD_BUCKET')
-#   etd_s3_endpoint = os.environ.get('S3_ETD_ENDPOINT')
-#   etd_s3_region = os.environ.get('S3_ETD_REGION')
-#   s3_test_prefix = os.environ.get('S3_TEST_PREFIX')
 #   dashboard_url = os.environ.get('DASHBOARD_URL')
+    dash_url = os.environ.get('DASH_URL')
+    dims_url = os.environ.get('DIMS_URL')
 
     # Version / Heartbeat route
     @dashboard.route('/version', endpoint="version", methods=['GET'])
@@ -69,7 +63,6 @@ def define_resources(app):
         # task_result = do_task(test_message)
         do_task(test_message)
         # task_id = task_result.id
-        # dump json
         current_app.logger.info("job ticket id: " + job_ticket_id)
         time.sleep(sleep_secs)  # wait for queue
 
@@ -85,30 +78,33 @@ def define_resources(app):
             result["Failed Mongo"] = {"status_code": 500, "text": str(err)}
             mongo_client.close()
 
-        # Check S3 buckets
+        # DASH healthcheck
         try:
-            etd_boto_session = boto3.Session(aws_access_key_id=etd_access_key,
-                                             aws_secret_access_key=etd_sec_key)
-            etd_s3_resource = etd_boto_session.resource('s3')
-            etd_s3_bucket = etd_s3_resource.Bucket(etd_bucket_name)
-
-            try:
-                etd_bucket_items = etd_s3_bucket.objects.all()
-                list(etd_bucket_items)
-            except Exception as err:
+            dash_response = requests.get(dash_url, verify=False)
+            if dash_response.status_code != 200:
                 result["num_failed"] += 1
-                result["tests_failed"].append("etd_bucket")
-                result["Failed etd bucket"] = {"status_code": 500,
-                                               "text": str(err)}
-                traceback.print_exc()
-
-            # todo- delete contents of s3 test thesis to reset test
-            # etd_s3_bucket.objects.filter(Prefix=s3_test_prefix).delete()
-
+                result["tests_failed"].append("DASH")
+                result["DASH HTTP error"] = {"status_code":
+                                             dash_response.status_code}
         except Exception as err:
             result["num_failed"] += 1
-            result["tests_failed"].append("S3")
-            result["Failed S3"] = {"status_code": 500, "text": str(err)}
+            result["tests_failed"].append("DASH")
+            result["DASH HTTP error"] = {"status_code": 500,
+                                         "text": str(err)}
+
+        # DIMS healthcheck
+        try:
+            dims_response = requests.get(dims_url, verify=False)
+            if dims_response.status_code != 200:
+                result["num_failed"] += 1
+                result["tests_failed"].append("DIMS")
+                result["DIMS HTTP Error"] = {"status_code":
+                                             dims_response.status_code}
+        except Exception as err:
+            result["num_failed"] += 1
+            result["tests_failed"].append("DIMS")
+            result["DIMS HTTP Error"] = {"status_code": 500,
+                                         "text": str(err)}
 
         # check if dashboard is running
         # leaving this test in for if/when etd has a dashboard
