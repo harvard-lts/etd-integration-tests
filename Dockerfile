@@ -19,16 +19,16 @@ RUN apt-get update && apt-get install -y libpq-dev gcc python-dev supervisor ngi
 
 
 RUN groupadd -r -g 55020 appcommon && \
-  useradd -u 55020 -g 55020 --create-home jstorforumadm
+  useradd -u 55020 -g 55020 --create-home etdadm
 
-# RUN useradd --create-home jstorforumadm
-WORKDIR /home/jstorforumadm
+# RUN useradd --create-home etdadm
+WORKDIR /home/etdadm
 
-COPY --chown=jstorforumadm:appcommon ./ .
+COPY --chown=etdadm:appcommon ./ .
 
-RUN chown jstorforumadm:appcommon -hR /home/jstorforumadm 
+RUN chown etdadm:appcommon -hR /home/etdadm 
 
-# Update permissions for the jstorforumadm user and group
+# Update permissions for the etdadm user and group
 COPY change_id.sh /root/change_id.sh
 RUN chmod 755 /root/change_id.sh && \
    /root/change_id.sh -u 55030 -g 1636
@@ -36,6 +36,6 @@ RUN chmod 755 /root/change_id.sh && \
 # Supervisor to run and manage multiple apps in the same container
 ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-USER jstorforumadm
+USER etdadm
 
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

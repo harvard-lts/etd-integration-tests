@@ -1,5 +1,7 @@
 # etd-integration-tests
 
+<img src="https://github.com/harvard-lts/etd-integration-tests/actions/workflows/pytest.yml/badge.svg">
+
 ### To start component:
 - clone repository
 - cp .env.example to .env
@@ -8,6 +10,6 @@
 - bring up docker
 - - docker-compose -f docker-compose-local.yml up --build -d --force-recreate --remove-orphans
 - start test by going to the browser at this url:
-- - https://localhost:24005/integration
+- - https://localhost:10610/integration
 - stop docker 
 - - docker-compose -f docker-compose-local.yml down
