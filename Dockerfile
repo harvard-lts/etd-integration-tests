@@ -31,7 +31,7 @@ RUN chown etdadm:appcommon -hR /home/etdadm
 # Update permissions for the etdadm user and group
 COPY change_id.sh /root/change_id.sh
 RUN chmod 755 /root/change_id.sh && \
-   /root/change_id.sh -u 55030 -g 1636
+   /root/change_id.sh -u 55031 -g 1636
 
 # Supervisor to run and manage multiple apps in the same container
 ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf
