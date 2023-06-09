@@ -11,13 +11,6 @@ LAST_QUEUE_NAME=etd_in_storage
 
 SLEEP_SECS=2
 
-# s3 info for via bucket
-S3_ETD_ENDPOINT=https://s3.us-east-1.amazonaws.com
-S3_ETD_ACCESS_KEY=
-S3_ETD_SECRET_KEY=
-S3_ETD_BUCKET=
-S3_ETD_REGION=us-east-1
-
 DRS_DROPBOX=
 ALMA_ENDPOINT=
 DASH_SFTP=
