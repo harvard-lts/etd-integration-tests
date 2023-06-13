@@ -14,8 +14,6 @@ services:
       - './:/home/etdadm'
     env_file:
       - '.env'
-    environment:
-      QUEUE_NAME: etd_submission_ready
     ports:
       # Integration tests
       - '10610:8081'
