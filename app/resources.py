@@ -1,20 +1,16 @@
 import time
 import requests
 from flask_restx import Resource, Api
-from flask import current_app
 import os
 import os.path
 import json
-# import certifi
-# import ssl
 from pymongo import MongoClient
-# from celery import Celery
-from tasks.tasks import do_task
-import random
+# from tasks.tasks import start_test
+from celery import Celery
 
 
 incoming_queue = os.environ.get('FIRST_QUEUE_NAME', 'etd_submission_ready')
-completed_ETDforum_queue = os.environ.get('LAST_QUEUE_NAME', 'etd_in_storage')
+completed_queue = os.environ.get('LAST_QUEUE_NAME', 'etd_in_storage')
 
 
 def define_resources(app):
@@ -57,13 +53,11 @@ def define_resources(app):
         # args=[{"job_ticket_id":"123","hello":"world"}],
         # kwargs={}, queue=incoming_queue)
         # read from 'final_queue' to see that it went through the pipeline
-        job_ticket_id = str(random.randint(1, 4294967296))
-        test_message = {"job_ticket_id": job_ticket_id,
-                        "integration_test": True}
-        # task_result = do_task(test_message)
-        do_task(test_message)
-        # task_id = task_result.id
-        current_app.logger.info("job ticket id: " + job_ticket_id)
+        message = {"hello": "world", "integration_test": True}
+        client = Celery('app')
+        client.config_from_object('celeryconfig')
+        client.send_task(name="etd-dash-service.tasks.send_to_dash",
+                         args=[message], kwargs={}, queue=incoming_queue)
         time.sleep(sleep_secs)  # wait for queue
 
         # read from mongodb
