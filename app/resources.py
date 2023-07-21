@@ -53,7 +53,10 @@ def define_resources(app):
         # args=[{"job_ticket_id":"123","hello":"world"}],
         # kwargs={}, queue=incoming_queue)
         # read from 'final_queue' to see that it went through the pipeline
-        message = {"hello": "world", "integration_test": True}
+        messagefile = os.environ.get('MESSAGE_FILE', "message.json")
+        with open(messagefile) as f:
+            messagejson = f.read()
+        message = json.loads(messagejson)
         client = Celery('app')
         client.config_from_object('celeryconfig')
         client.send_task(name="etd-dash-service.tasks.send_to_dash",
