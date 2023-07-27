@@ -5,6 +5,10 @@ __pycache__
 .env
 celeryconfig.py
 
+#rsa keys
+*_rsa
+known_hosts
+
 # Data stored locally
 /data
 

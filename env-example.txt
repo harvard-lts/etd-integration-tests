@@ -9,6 +9,12 @@ MONGO_COLLECTION=integration_test
 FIRST_QUEUE_NAME=etd_submission_ready
 LAST_QUEUE_NAME=etd_in_storage
 
+#proquest sftp creds
+PRIVATE_KEY_PATH=
+KNOWN_HOSTS_PATH=
+dropboxServer=
+dropboxUser=
+
 SLEEP_SECS=2
 
 DRS_DROPBOX=
@@ -20,3 +26,4 @@ DASH_URL=
 DIMS_URL=
 
 MESSAGE_FILE=message.json
+

@@ -1,8 +1,8 @@
 {
-    "hello": "world", "integration_test": true,
+    "job_ticket_id": "integration_testing", "integration_test": true,
     "feature_flags": 
     {
-        "dash_feature_flag": "off",
+        "dash_feature_flag": "on",
         "alma_feature_flag": "off",
         "send_to_drs_feature_flag": "off",
         "drs_holding_record_feature_flag": "off"
