@@ -8,7 +8,8 @@ from pymongo import MongoClient
 # from tasks.tasks import start_test
 from celery import Celery
 import pysftp
-
+import glob
+import shutil
 
 incoming_queue = os.environ.get('FIRST_QUEUE_NAME', 'etd_submission_ready')
 completed_queue = os.environ.get('LAST_QUEUE_NAME', 'etd_in_storage')
@@ -91,6 +92,17 @@ def define_resources(app):
                          args=[message], kwargs={}, queue=incoming_queue)
 
         time.sleep(sleep_secs)  # wait for queue
+
+        if not glob.glob('/home/etdadm/data/in/proquest*-999999-gsd/submission_999999.zip'):  # noqa: E501
+            result["num_failed"] += 1
+            result["tests_failed"].append("DATA IN")
+            result["Failed file check"] = {"status_code": 500,
+                                           "text": "No submission found"}
+        else:
+            for filename in glob.glob('/home/etdadm/data/in/proquest*-999999-gsd/*'):  # noqa: E501
+                os.remove(filename)
+            for filename in glob.glob('/home/etdadm/data/in/proquest*-999999-gsd'):  # noqa: E501
+                shutil.rmtree(filename)
 
         # read from mongodb
         try:
