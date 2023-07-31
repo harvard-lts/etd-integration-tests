@@ -80,7 +80,7 @@ def define_resources(app):
                                    private_key=private_key) as sftp:
                 if sftp.exists(f"{archiveDir}/{zipFile}"):
                     sftp.remove(f"{archiveDir}/{zipFile}")
-                sftp.put(f"./data/{zipFile}",
+                sftp.put(f"./testdata/{zipFile}",
                          f"{incomingDir}/{zipFile}")
         except Exception as err:
             result["num_failed"] += 1
