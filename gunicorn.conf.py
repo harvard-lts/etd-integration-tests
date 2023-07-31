@@ -62,15 +62,13 @@ logconfig_dict = {
         "error_console": {
             "class": "logging.FileHandler",
             "formatter": "json_formatter",
-            "filename": f"/home/etdadm/logs/etd_itest/{container_id}" +
-                        "/error_console_{container_id}_{timestamp}.log",
+            "filename": f"/home/etdadm/logs/etd_itest/{container_id}/error_console_{container_id}_{timestamp}.log",   # noqa: E501
             "mode": "a"
         },
         "console": {
             "class": "logging.FileHandler",
             "formatter": "json_formatter",
-            "filename": f"/home/etdadm/logs/etd_itest/{container_id}" +
-                        "/console_{container_id}_{timestamp}.log",
+            "filename": f"/home/etdadm/logs/etd_itest/{container_id}/console_{container_id}_{timestamp}.log",  # noqa: E501
             "mode": "a"
         }
     },

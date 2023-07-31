@@ -7,7 +7,9 @@ import json
 from pymongo import MongoClient
 # from tasks.tasks import start_test
 from celery import Celery
-
+import pysftp
+import glob
+import shutil
 
 incoming_queue = os.environ.get('FIRST_QUEUE_NAME', 'etd_submission_ready')
 completed_queue = os.environ.get('LAST_QUEUE_NAME', 'etd_in_storage')
@@ -32,6 +34,14 @@ def define_resources(app):
 #   dashboard_url = os.environ.get('DASHBOARD_URL')
     dash_url = os.environ.get('DASH_URL')
     dims_url = os.environ.get('DIMS_URL')
+
+    # proquest2dash test vars
+    private_key = os.getenv("PRIVATE_KEY_PATH")
+    remoteSite = os.getenv("dropboxServer")
+    remoteUser = os.getenv("dropboxUser")
+    archiveDir = "archives/gsd"
+    incomingDir = "incoming/gsd"
+    zipFile = "submission_999999.zip"
 
     # Version / Heartbeat route
     @dashboard.route('/version', endpoint="version", methods=['GET'])
@@ -59,9 +69,40 @@ def define_resources(app):
         message = json.loads(messagejson)
         client = Celery('app')
         client.config_from_object('celeryconfig')
+
+        try:
+            # cnopts = pysftp.CnOpts()
+            # cnopts.hostkeys = known_hosts
+            # cnopts = pysftp.CnOpts()
+            # cnopts.hostkeys = None
+            with pysftp.Connection(host=remoteSite,
+                                   username=remoteUser,
+                                   private_key=private_key) as sftp:
+                if sftp.exists(f"{archiveDir}/{zipFile}"):
+                    sftp.remove(f"{archiveDir}/{zipFile}")
+                sftp.put(f"./testdata/{zipFile}",
+                         f"{incomingDir}/{zipFile}")
+        except Exception as err:
+            result["num_failed"] += 1
+            result["tests_failed"].append("SFTP")
+            result["Proquest Dropbox sftp failed"] = {"status_code": 500,
+                                                      "text": str(err)}
+
         client.send_task(name="etd-dash-service.tasks.send_to_dash",
                          args=[message], kwargs={}, queue=incoming_queue)
+
         time.sleep(sleep_secs)  # wait for queue
+
+        if not glob.glob('/home/etdadm/data/in/proquest*-999999-gsd/submission_999999.zip'):  # noqa: E501
+            result["num_failed"] += 1
+            result["tests_failed"].append("DATA IN")
+            result["Failed file check"] = {"status_code": 500,
+                                           "text": "No submission found"}
+        else:
+            for filename in glob.glob('/home/etdadm/data/in/proquest*-999999-gsd/*'):  # noqa: E501
+                os.remove(filename)
+            for filename in glob.glob('/home/etdadm/data/in/proquest*-999999-gsd'):  # noqa: E501
+                shutil.rmtree(filename)
 
         # read from mongodb
         try:

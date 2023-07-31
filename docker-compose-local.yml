@@ -12,6 +12,7 @@ services:
       dockerfile: './DockerfileLocal'
     volumes:
       - './:/home/etdadm'
+      - '/tmp/etd_dash_data/in:/home/etdadm/data/in'
     env_file:
       - '.env'
     ports:
