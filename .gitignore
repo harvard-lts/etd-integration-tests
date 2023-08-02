@@ -13,8 +13,8 @@ known_hosts
 /data
 
 # Logs
-*.log
-logs/*.log
+logs/etd_itest/*
+!logs/etd_itest/.keep
 
 # Jobs
 jobs/
