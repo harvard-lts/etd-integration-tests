@@ -2,6 +2,7 @@ import requests
 import os
 from pymongo import MongoClient
 
+
 class ConnectivityChecks():
 
     def mongodb_connectivity_test(self):
@@ -17,8 +18,10 @@ class ConnectivityChecks():
 
         except Exception as err:
             result = {"num_failed": 1,
-                  "tests_failed": ["Mongo"], 
-                  "info": {"Failed Mongo": {"status_code": 500, "text": str(err)}}}
+                      "tests_failed": ["Mongo"],
+                      "info": {"Failed Mongo":
+                               {"status_code": 500,
+                                "text": str(err)}}}
             mongo_client.close()
         return result
 
@@ -31,33 +34,36 @@ class ConnectivityChecks():
             dash_response = requests.get(dash_url, verify=False)
             if dash_response.status_code != 200:
                 result = {"num_failed": 1,
-                  "tests_failed": ["DASH"], 
-                  "info": {"DASH HTTP error": {"status_code":
-                                             dash_response.status_code}}}
+                          "tests_failed": ["DASH"],
+                          "info": {"DASH HTTP error":
+                                   {"status_code":
+                                    dash_response.status_code}}}
 
         except Exception as err:
             result = {"num_failed": 1,
-                  "tests_failed": ["DASH"], 
-                  "info": {"DASH HTTP error": {"status_code": 500,
-                                         "text": str(err)}}}
+                      "tests_failed": ["DASH"],
+                      "info": {"DASH HTTP error":
+                               {"status_code": 500,
+                                "text": str(err)}}}
         return result
 
     def dims_connectivity_test(self):
         result = {"num_failed": 0,
                   "tests_failed": [], "info": {}}
         # DIMS healthcheck
-        dims_url = os.environ.get('DIMS_URL') 
+        dims_url = os.environ.get('DIMS_URL')
         try:
             dims_response = requests.get(dims_url, verify=False)
             if dims_response.status_code != 200:
                 result = {"num_failed": 1,
-                "tests_failed": ["DASH"], 
-                  "info": {"DIMS HTTP error": {"status_code":
-                                             dims_response.status_code}}}
+                          "tests_failed": ["DASH"],
+                          "info": {"DIMS HTTP error":
+                                   {"status_code":
+                                    dims_response.status_code}}}
         except Exception as err:
             result = {"num_failed": 1,
-                  "tests_failed": ["DASH"], 
-                  "info": {"DIMS HTTP error": {"status_code": 500,
-                                         "text": str(err)}}}
+                      "tests_failed": ["DASH"],
+                      "info": {"DIMS HTTP error":
+                               {"status_code": 500,
+                                "text": str(err)}}}
         return result
-
