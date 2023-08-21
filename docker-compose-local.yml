@@ -13,9 +13,9 @@ services:
     volumes:
       - './:/home/etdadm'
       - '/tmp/etd_dash_data/in:/home/etdadm/data/in'
-      - 'message.json:/home/etdadmin/message.json'
+      - './message.json:/home/etdadmin/message.json'
     env_file:
-      - '.env'
+      - './.env'
     ports:
       # Integration tests
       - '10610:8081'
