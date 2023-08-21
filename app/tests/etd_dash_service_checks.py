@@ -83,3 +83,26 @@ class ETDDashServiceChecks():
         time.sleep(sleep_secs)  # wait for queue
 
         return result
+
+    def check_for_duplicates(self):
+        identifier = os.getenv("SUBMISSION_PQ_ID")
+        rest_url = os.getenv("DASH_REST_URL",
+                             "https://dash.harvard.edu/rest")
+        query_url = f"{rest_url}/items/find-by-metadata-field"
+        self.logger.debug(f'URL: {query_url}')
+        json_query = {"key": "dc.identifier.other", "value": identifier}
+        resp = requests.post(query_url, json=json_query, verify=False)
+        if resp.text == "[]":
+            return False
+        else:
+            return True
+
+    def get_session_key(self):
+        rest_url = os.getenv("DASH_REST_URL",
+                             "https://dash.harvard.edu/rest")
+        login_url = f"{rest_url}/login"
+        login_email = os.getenv("DASH_LOGIN_EMAIL")
+        login_pw = os.getenv("DASH_LOGIN_PW")
+        login_info = f'email={login_email}&password={login_pw}'
+        resp = requests.post(login_url, data=login_data, verify=False)
+        print(resp.text)
