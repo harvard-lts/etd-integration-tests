@@ -5,6 +5,7 @@ from celery import Celery
 import pysftp
 import glob
 import shutil
+import requests
 
 
 class ETDDashServiceChecks():
@@ -75,6 +76,45 @@ class ETDDashServiceChecks():
                                       {"status_code": 500,
                                        "text": str(err)}}
 
+                resp_text = self.check_for_duplicates()
+                if resp_text != "[]":
+                    uuid = json.loads(resp_text)[0]["uuid"]
+                    url = f"{self.rest_url}/items/{uuid}"
+                    session_key = self.get_session_key()
+                    headers = {'Cookie': session_key}
+                    response = requests.delete(url, headers=headers,
+                                               verify=False)
+
+                    if response.status_code != 200:
+                        result["num_failed"] += 1
+                        result["tests_failed"].append("DASH")
+                        result["info"] = {"DASH delete failed":
+                                          {"status_code": 500,
+                                           "text": "Delete failed"}}
+
+                '''
+                try:
+                    if self.check_for_duplicates():
+                        result["num_failed"] += 1
+                        result["tests_failed"].append("DASH")
+                        result["info"] = {"Duplicate check failed":
+                                          {"status_code": 500,
+                                           "text": "Duplicate found"}}
+                except Exception as err:
+                    result["num_failed"] += 1
+                    result["tests_failed"].append("DASH")
+                    result["info"] = {"Duplicate check failed":
+                                      {"status_code": 500,
+                                       "text": str(err)}}
+                try:
+                    self.get_session_key()
+                except Exception as err:
+                    result["num_failed"] += 1
+                    result["tests_failed"].append("DASH")
+                    result["info"] = {"DASH login failed":
+                                      {"status_code": 500,
+                                       "text": str(err)}} '''
+
         client.send_task(name="etd-dash-service.tasks.send_to_dash",
                          args=[message], kwargs={}, queue=incoming_queue)
 
@@ -89,13 +129,13 @@ class ETDDashServiceChecks():
         rest_url = os.getenv("DASH_REST_URL",
                              "https://dash.harvard.edu/rest")
         query_url = f"{rest_url}/items/find-by-metadata-field"
-        self.logger.debug(f'URL: {query_url}')
         json_query = {"key": "dc.identifier.other", "value": identifier}
         resp = requests.post(query_url, json=json_query, verify=False)
-        if resp.text == "[]":
+        return resp.text
+        '''if resp.text == "[]":
             return False
         else:
-            return True
+            return True'''
 
     def get_session_key(self):
         rest_url = os.getenv("DASH_REST_URL",
@@ -104,5 +144,5 @@ class ETDDashServiceChecks():
         login_email = os.getenv("DASH_LOGIN_EMAIL")
         login_pw = os.getenv("DASH_LOGIN_PW")
         login_info = f'email={login_email}&password={login_pw}'
-        resp = requests.post(login_url, data=login_data, verify=False)
-        print(resp.text)
+        resp = requests.post(login_url, data=login_info, verify=False)
+        return resp.cookies.get('JSESSIONID')
