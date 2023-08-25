@@ -75,13 +75,13 @@ class ETDDashServiceChecks():
                     result["info"] = {"Proquest Dropbox sftp failed":
                                       {"status_code": 500,
                                        "text": str(err)}}
-
+                rest_url = os.getenv("DASH_REST_URL")
                 resp_text = self.check_for_duplicates()
                 if resp_text != "[]":
                     uuid = json.loads(resp_text)[0]["uuid"]
-                    url = f"{self.rest_url}/items/{uuid}"
+                    url = f"{rest_url}/items/{uuid}"
                     session_key = self.get_session_key()
-                    headers = {'Cookie': session_key}
+                    headers = {'Cookie': f'JSESSIONID={session_key}'}
                     response = requests.delete(url, headers=headers,
                                                verify=False)
 
@@ -89,7 +89,10 @@ class ETDDashServiceChecks():
                         result["num_failed"] += 1
                         result["tests_failed"].append("DASH")
                         result["info"] = {"DASH delete failed":
-                                          {"status_code": 500,
+                                          {"status_code": response.status_code,
+                                           "url": url,
+                                           "uuid": uuid,
+                                           "session_key": session_key,
                                            "text": "Delete failed"}}
 
                 '''
@@ -125,9 +128,9 @@ class ETDDashServiceChecks():
         return result
 
     def check_for_duplicates(self):
-        identifier = os.getenv("SUBMISSION_PQ_ID")
         rest_url = os.getenv("DASH_REST_URL",
-                             "https://dash.harvard.edu/rest")
+                             "https://dspace6-qai.lib.harvard.edu/rest")
+        identifier = os.getenv("SUBMISSION_PQ_ID")
         query_url = f"{rest_url}/items/find-by-metadata-field"
         json_query = {"key": "dc.identifier.other", "value": identifier}
         resp = requests.post(query_url, json=json_query, verify=False)
@@ -139,10 +142,10 @@ class ETDDashServiceChecks():
 
     def get_session_key(self):
         rest_url = os.getenv("DASH_REST_URL",
-                             "https://dash.harvard.edu/rest")
+                             "https://dspace6-qai.lib.harvard.edu/rest")
         login_url = f"{rest_url}/login"
         login_email = os.getenv("DASH_LOGIN_EMAIL")
         login_pw = os.getenv("DASH_LOGIN_PW")
-        login_info = f'email={login_email}&password={login_pw}'
+        login_info = {"email": login_email, "password": login_pw}
         resp = requests.post(login_url, data=login_info, verify=False)
         return resp.cookies.get('JSESSIONID')
