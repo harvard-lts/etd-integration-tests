@@ -29,7 +29,8 @@ class ConnectivityChecks():
         result = {"num_failed": 0,
                   "tests_failed": [], "info": {}}
         # DASH healthcheck
-        dash_url = os.environ.get('DASH_URL')
+        dash_rest_url = os.environ.get('DASH_REST_URL')
+        dash_url = f'{dash_rest_url}/test'
         try:
             dash_response = requests.get(dash_url, verify=False)
             if dash_response.status_code != 200:
