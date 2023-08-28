@@ -37,7 +37,6 @@ class ETDDashServiceChecks():
         # only prep test object if dash integration feature flag is on
         if FEATURE_FLAGS in message:
             feature_flags = message[FEATURE_FLAGS]
-            # new_message[FEATURE_FLAGS] = feature_flags
             if (DASH_FEATURE_FLAG in feature_flags and
                     feature_flags[DASH_FEATURE_FLAG] == "on"):
 
@@ -72,14 +71,22 @@ class ETDDashServiceChecks():
                                        "count": count,
                                        "text": resp_text}}
                 self.cleanup_test_object()
-                self.sftp_test_object()
+                # put the test object in the dropbox for a second time
+                try:
+                    self.sftp_test_object()
+                except Exception as err:
+                    result["num_failed"] += 1
+                    result["tests_failed"].append("SFTP")
+                    result["info"] = {"Proquest Dropbox sftp failed":
+                                      {"status_code": 500,
+                                       "text": str(err)}}
                 client.send_task(name="etd-dash-service.tasks.send_to_dash",
                                  args=[message], kwargs={},
                                  queue=incoming_queue)
                 time.sleep(sleep_secs)  # wait for queue
                 resp_text = self.get_dash_object()
                 count = len(json.loads(resp_text))
-                if count != 2:
+                if count == 2:
                     result["num_failed"] += 1
                     result["tests_failed"].append("DASH")
                     result["info"] = {"DASH count failed":
