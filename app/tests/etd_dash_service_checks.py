@@ -17,14 +17,6 @@ class ETDDashServiceChecks():
         incoming_queue = os.environ.get('FIRST_QUEUE_NAME',
                                         'etd_submission_ready')
 
-        # proquest2dash test vars
-        private_key = os.getenv("PRIVATE_KEY_PATH")
-        remoteSite = os.getenv("dropboxServer")
-        remoteUser = os.getenv("dropboxUser")
-        archiveDir = "archives/gsd"
-        incomingDir = "incoming/gsd"
-        zipFile = "submission_999999.zip"
-
         FEATURE_FLAGS = "feature_flags"
         DASH_FEATURE_FLAG = "dash_feature_flag"
 
@@ -50,33 +42,51 @@ class ETDDashServiceChecks():
                     feature_flags[DASH_FEATURE_FLAG] == "on"):
 
                 # clear out any old test object
-                if glob.glob('/home/etdadm/data/in/proquest*-999999-gsd/submission_999999.zip'):  # noqa: E501
-                    for filename in glob.glob('/home/etdadm/data/in/proquest*-999999-gsd/*'):  # noqa: E501
-                        os.remove(filename)
-                    for filename in glob.glob('/home/etdadm/data/in/proquest*-999999-gsd'):  # noqa: E501
-                        shutil.rmtree(filename)
+                self.cleanup_test_object()
 
                 # put the test object in the dropbox
                 try:
-                    # cnopts = pysftp.CnOpts()
-                    # cnopts.hostkeys = known_hosts
-                    # cnopts = pysftp.CnOpts()
-                    # cnopts.hostkeys = None
-                    with pysftp.Connection(host=remoteSite,
-                                           username=remoteUser,
-                                           private_key=private_key) as sftp:
-                        if sftp.exists(f"{archiveDir}/{zipFile}"):
-                            sftp.remove(f"{archiveDir}/{zipFile}")
-                        sftp.put(f"./testdata/{zipFile}",
-                                 f"{incomingDir}/{zipFile}")
+                    self.sftp_test_object()
                 except Exception as err:
                     result["num_failed"] += 1
                     result["tests_failed"].append("SFTP")
                     result["info"] = {"Proquest Dropbox sftp failed":
                                       {"status_code": 500,
                                        "text": str(err)}}
+
+                client.send_task(name="etd-dash-service.tasks.send_to_dash",
+                                args=[message], kwargs={}, queue=incoming_queue)
+                sleep_secs = int(os.environ.get('SLEEP_SECS', 30))
+                time.sleep(sleep_secs)  # wait for queue
+
                 rest_url = os.getenv("DASH_REST_URL")
-                resp_text = self.check_for_duplicates()
+                resp_text = self.get_dash_object()
+                count = len(json.loads(resp_text))
+                if count != 1:
+                    result["num_failed"] += 1
+                    result["tests_failed"].append("DASH")
+                    result["info"] = {"DASH count failed":
+                                        {"status_code": 500,
+                                         "url": rest_url,
+                                         "count": count,
+                                         "text": resp_text}}
+                self.cleanup_test_object()
+                self.sftp_test_object()
+                client.send_task(name="etd-dash-service.tasks.send_to_dash",
+                                args=[message], kwargs={}, queue=incoming_queue)
+                time.sleep(sleep_secs)  # wait for queue
+                resp_text = self.get_dash_object()
+                count = len(json.loads(resp_text))
+                if count != 2:
+                    result["num_failed"] += 1
+                    result["tests_failed"].append("DASH")
+                    result["info"] = {"DASH count failed":
+                                        {"status_code": 500,
+                                         "url": rest_url,
+                                         "count": count,
+                                         "text": resp_text}}
+
+
                 if resp_text != "[]":
                     uuid = json.loads(resp_text)[0]["uuid"]
                     url = f"{rest_url}/items/{uuid}"
@@ -94,40 +104,20 @@ class ETDDashServiceChecks():
                                            "uuid": uuid,
                                            "session_key": session_key,
                                            "text": "Delete failed"}}
+                        
+                self.cleanup_test_object()        
+                
+        else:
+            client.send_task(name="etd-dash-service.tasks.send_to_dash",
+                            args=[message], kwargs={}, queue=incoming_queue)
 
-                '''
-                try:
-                    if self.check_for_duplicates():
-                        result["num_failed"] += 1
-                        result["tests_failed"].append("DASH")
-                        result["info"] = {"Duplicate check failed":
-                                          {"status_code": 500,
-                                           "text": "Duplicate found"}}
-                except Exception as err:
-                    result["num_failed"] += 1
-                    result["tests_failed"].append("DASH")
-                    result["info"] = {"Duplicate check failed":
-                                      {"status_code": 500,
-                                       "text": str(err)}}
-                try:
-                    self.get_session_key()
-                except Exception as err:
-                    result["num_failed"] += 1
-                    result["tests_failed"].append("DASH")
-                    result["info"] = {"DASH login failed":
-                                      {"status_code": 500,
-                                       "text": str(err)}} '''
+            sleep_secs = int(os.environ.get('SLEEP_SECS', 2))
 
-        client.send_task(name="etd-dash-service.tasks.send_to_dash",
-                         args=[message], kwargs={}, queue=incoming_queue)
-
-        sleep_secs = int(os.environ.get('SLEEP_SECS', 2))
-
-        time.sleep(sleep_secs)  # wait for queue
+            time.sleep(sleep_secs)  # wait for queue
 
         return result
 
-    def check_for_duplicates(self):
+    def get_dash_object(self):
         rest_url = os.getenv("DASH_REST_URL",
                              "https://dspace6-qai.lib.harvard.edu/rest")
         identifier = os.getenv("SUBMISSION_PQ_ID")
@@ -149,3 +139,26 @@ class ETDDashServiceChecks():
         login_info = {"email": login_email, "password": login_pw}
         resp = requests.post(login_url, data=login_info, verify=False)
         return resp.cookies.get('JSESSIONID')
+
+    def cleanup_test_object(self):
+        if glob.glob('/home/etdadm/data/in/proquest*-999999-gsd/submission_999999.zip'):  # noqa: E501
+            for filename in glob.glob('/home/etdadm/data/in/proquest*-999999-gsd/*'):  # noqa: E501
+                os.remove(filename)
+            for filename in glob.glob('/home/etdadm/data/in/proquest*-999999-gsd'):  # noqa: E501
+                shutil.rmtree(filename)
+
+    def sftp_test_object(self):
+        # proquest2dash test vars
+        private_key = os.getenv("PRIVATE_KEY_PATH")
+        remoteSite = os.getenv("dropboxServer")
+        remoteUser = os.getenv("dropboxUser")
+        archiveDir = "archives/gsd"
+        incomingDir = "incoming/gsd"
+        zipFile = "submission_999999.zip"
+        with pysftp.Connection(host=remoteSite,
+                               username=remoteUser,
+                               private_key=private_key) as sftp:
+            if sftp.exists(f"{archiveDir}/{zipFile}"):
+                sftp.remove(f"{archiveDir}/{zipFile}")
+                sftp.put(f"./testdata/{zipFile}",
+                         f"{incomingDir}/{zipFile}")
