@@ -55,7 +55,8 @@ class ETDDashServiceChecks():
                                        "text": str(err)}}
 
                 client.send_task(name="etd-dash-service.tasks.send_to_dash",
-                                args=[message], kwargs={}, queue=incoming_queue)
+                                 args=[message], kwargs={},
+                                 queue=incoming_queue)
                 sleep_secs = int(os.environ.get('SLEEP_SECS', 30))
                 time.sleep(sleep_secs)  # wait for queue
 
@@ -66,14 +67,15 @@ class ETDDashServiceChecks():
                     result["num_failed"] += 1
                     result["tests_failed"].append("DASH")
                     result["info"] = {"DASH count failed":
-                                        {"status_code": 500,
-                                         "url": rest_url,
-                                         "count": count,
-                                         "text": resp_text}}
+                                      {"status_code": 500,
+                                       "url": rest_url,
+                                       "count": count,
+                                       "text": resp_text}}
                 self.cleanup_test_object()
                 self.sftp_test_object()
                 client.send_task(name="etd-dash-service.tasks.send_to_dash",
-                                args=[message], kwargs={}, queue=incoming_queue)
+                                 args=[message], kwargs={},
+                                 queue=incoming_queue)
                 time.sleep(sleep_secs)  # wait for queue
                 resp_text = self.get_dash_object()
                 count = len(json.loads(resp_text))
@@ -81,12 +83,12 @@ class ETDDashServiceChecks():
                     result["num_failed"] += 1
                     result["tests_failed"].append("DASH")
                     result["info"] = {"DASH count failed":
-                                        {"status_code": 500,
-                                         "url": rest_url,
-                                         "count": count,
-                                         "text": resp_text}}
+                                      {"status_code": 500,
+                                       "url": rest_url,
+                                       "count": count,
+                                       "text": resp_text}}
 
-
+                # delete the test object from dash
                 if resp_text != "[]":
                     uuid = json.loads(resp_text)[0]["uuid"]
                     url = f"{rest_url}/items/{uuid}"
@@ -104,12 +106,12 @@ class ETDDashServiceChecks():
                                            "uuid": uuid,
                                            "session_key": session_key,
                                            "text": "Delete failed"}}
-                        
-                self.cleanup_test_object()        
-                
+
+                self.cleanup_test_object()
+
         else:
             client.send_task(name="etd-dash-service.tasks.send_to_dash",
-                            args=[message], kwargs={}, queue=incoming_queue)
+                             args=[message], kwargs={}, queue=incoming_queue)
 
             sleep_secs = int(os.environ.get('SLEEP_SECS', 2))
 
