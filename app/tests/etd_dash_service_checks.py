@@ -20,12 +20,6 @@ class ETDDashServiceChecks():
         FEATURE_FLAGS = "feature_flags"
         DASH_FEATURE_FLAG = "dash_feature_flag"
 
-        # Send a simple task (create and send in 1 step)
-        # res = client.send_task('tasks.tasks.do_task',
-        # args=[{"job_ticket_id":"123","hello":"world"}],
-        # kwargs={}, queue=incoming_queue)
-        # read from 'final_queue' to see that it went through the pipeline
-
         client = Celery('app')
         client.config_from_object('celeryconfig')
 
@@ -40,10 +34,10 @@ class ETDDashServiceChecks():
             if (DASH_FEATURE_FLAG in feature_flags and
                     feature_flags[DASH_FEATURE_FLAG] == "on"):
 
-                # clear out any old test object
+                # 1. clear out any old test object
                 self.cleanup_test_object()
 
-                # put the test object in the dropbox
+                # 2. put the test object in the dropbox
                 try:
                     self.sftp_test_object()
                 except Exception as err:
@@ -53,6 +47,7 @@ class ETDDashServiceChecks():
                                       {"status_code": 500,
                                        "text": str(err)}}
 
+                # 3. send the test object to dash
                 client.send_task(name="etd-dash-service.tasks.send_to_dash",
                                  args=[message], kwargs={},
                                  queue=incoming_queue)
@@ -61,6 +56,7 @@ class ETDDashServiceChecks():
 
                 rest_url = os.getenv("DASH_REST_URL")
                 resp_text = self.get_dash_object()
+                # 4. count should be 1, shows insertion into dash
                 count = len(json.loads(resp_text))
                 if count != 1:
                     result["num_failed"] += 1
@@ -70,8 +66,9 @@ class ETDDashServiceChecks():
                                        "url": rest_url,
                                        "count": count,
                                        "text": resp_text}}
+                # 5. cleanup the test object from the filesystem
                 self.cleanup_test_object()
-                # put the test object in the dropbox for a second time
+                # 6. put the test object in the dropbox for a second time
                 try:
                     self.sftp_test_object()
                 except Exception as err:
@@ -86,6 +83,7 @@ class ETDDashServiceChecks():
                 time.sleep(sleep_secs)  # wait for queue
                 resp_text = self.get_dash_object()
                 count = len(json.loads(resp_text))
+                # 7. count shouldn't be 2, no duplicate insertion allowed
                 if count == 2:
                     result["num_failed"] += 1
                     result["tests_failed"].append("DASH")
@@ -95,7 +93,7 @@ class ETDDashServiceChecks():
                                        "count": count,
                                        "text": resp_text}}
 
-                # delete the test object from dash
+                # 8. delete the test object from dash
                 if resp_text != "[]":
                     uuid = json.loads(resp_text)[0]["uuid"]
                     url = f"{rest_url}/items/{uuid}"
@@ -113,7 +111,7 @@ class ETDDashServiceChecks():
                                            "uuid": uuid,
                                            "session_key": session_key,
                                            "text": "Delete failed"}}
-
+                # 8. cleanup the test object from the filesystem
                 self.cleanup_test_object()
 
         else:
