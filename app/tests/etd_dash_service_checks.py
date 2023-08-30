@@ -114,13 +114,13 @@ class ETDDashServiceChecks():
                 # 8. cleanup the test object from the filesystem
                 self.cleanup_test_object()
 
-        else:
-            client.send_task(name="etd-dash-service.tasks.send_to_dash",
-                             args=[message], kwargs={}, queue=incoming_queue)
+            else:
+                client.send_task(name="etd-dash-service.tasks.send_to_dash",
+                                args=[message], kwargs={}, queue=incoming_queue)
 
-            sleep_secs = int(os.environ.get('SLEEP_SECS', 2))
+                sleep_secs = int(os.environ.get('SLEEP_SECS', 2))
 
-            time.sleep(sleep_secs)  # wait for queue
+                time.sleep(sleep_secs)  # wait for queue
 
         return result
 
