@@ -116,7 +116,8 @@ class ETDDashServiceChecks():
 
             else:
                 client.send_task(name="etd-dash-service.tasks.send_to_dash",
-                                args=[message], kwargs={}, queue=incoming_queue)
+                                 args=[message], kwargs={},
+                                 queue=incoming_queue)
 
                 sleep_secs = int(os.environ.get('SLEEP_SECS', 2))
 
