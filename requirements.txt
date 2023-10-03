@@ -32,6 +32,6 @@ six==1.16.0
 structlog==20.1.0
 tenacity==8.0.1
 toml==0.10.2
-urllib3==1.26.6
+urllib3==1.26.17
 uuid==1.30
 Werkzeug==2.3.3
