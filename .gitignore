@@ -6,6 +6,7 @@ __pycache__
 
 #rsa keys
 *_rsa
+jwt.private.key
 known_hosts
 
 # Data stored locally

@@ -27,3 +27,10 @@ DIMS_URL=
 
 MESSAGE_FILE=message.json
 
+TEST_DATA_DIRECTORY=/home/etdadm/testdata
+ETD_IN_DIR=/etds/qa/etd_dash_data/in
+
+JWT_PRIVATE_KEY_PATH=
+JWT_EXPIRATION=1800
+DIMS_ENDPOINT=
+
