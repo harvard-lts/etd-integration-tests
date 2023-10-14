@@ -125,7 +125,7 @@ class ETDDAISEndToEnd():
                         "accessFlag": "N",
                         "contentModel": content_model,
                         "depositingSystem": "ETD",
-                        "firstGenerationInDrs": "Y",
+                        "firstGenerationInDrs": "yes",
                         "usageClass": "LOWUSE",
                         "storageClass": "AR",
                         "ownerCode": "HUL.TEST",
