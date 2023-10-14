@@ -123,6 +123,9 @@ class ETDDAISEndToEnd():
 
         payload_data = {"package_id": unique_osn,
                     "fs_source_path": dest_path,
+                    "s3_path": "",
+                    "s3_bucket_name": "",
+                    "depositing_application": "ETD",
                     "admin_metadata": {
                         "accessFlag": "N",
                         "contentModel": content_model,
