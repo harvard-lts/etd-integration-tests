@@ -2,12 +2,7 @@ import os
 import os.path
 import shutil
 from datetime import datetime
-from datetime import timedelta
-import jwt
-import hashlib
-import jcs
 import requests
-import traceback
 import logging
 from logging.handlers import TimedRotatingFileHandler
 
@@ -152,40 +147,14 @@ class ETDDAISEndToEnd():
     
 
     def __call_dims(self, payload_data):
-        jwt_private_key_path = os.getenv('JWT_PRIVATE_KEY_PATH')
-        jwt_expiration = int(os.getenv('JWT_EXPIRATION'))
+
         dims_endpoint = os.getenv('DIMS_ENDPOINT')
-
-        with open(jwt_private_key_path) as jwt_private_key_file:
-            jwt_private_key = jwt_private_key_file.read()
-
-
-        # calculate iat and exp values
-        current_datetime = datetime.now()
-        current_epoch = int(current_datetime.timestamp())
-        expiration = current_datetime + timedelta(seconds=jwt_expiration)
-
-        # get request_body hash
-        request_body = jcs.canonicalize(payload_data).decode()
-        bodySHA256Hash = hashlib.sha256(request_body.encode()).hexdigest()
-
-        # generate JWT token
-        jwt_token = jwt.encode(
-            payload={'iss': 'ETD', 'iat': current_epoch, 'exp': int(expiration.timestamp()),
-                    'bodySHA256Hash': bodySHA256Hash},
-            key=jwt_private_key,
-            algorithm='RS256',
-            headers={"alg": "RS256", "typ": "JWT", "kid": "defaultETD"}
-        )
-
-        headers = {"Authorization": "Bearer " + jwt_token}
 
         # Call DIMS ingest
         ingest_etd_export = None
 
         ingest_etd_export = requests.post(
             dims_endpoint + '/ingest',
-            headers=headers,
             json=payload_data,
             verify=False)
         
