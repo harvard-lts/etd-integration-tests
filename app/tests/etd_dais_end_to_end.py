@@ -121,7 +121,6 @@ class ETDDAISEndToEnd():
                     "s3_path": "",
                     "s3_bucket_name": "",
                     "depositing_application": "ETD",
-                    "fs_cleanup": "yes",
                     "admin_metadata": {
                         "accessFlag": "N",
                         "contentModel": content_model,
