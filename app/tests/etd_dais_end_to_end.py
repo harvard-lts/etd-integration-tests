@@ -114,13 +114,14 @@ class ETDDAISEndToEnd():
 
     def __build_drs_admin_md(self, dest_path, content_model):
         # Create a unique OSN based on the timestamp
-        unique_osn = "ETD_TEST_" + str(int(datetime.now().timestamp()))
+        unique_osn = "ETD_TEST_" + content_model + "_" + str(int(datetime.now().timestamp()))
 
         payload_data = {"package_id": unique_osn,
                     "fs_source_path": dest_path,
                     "s3_path": "",
                     "s3_bucket_name": "",
                     "depositing_application": "ETD",
+                    "fs_cleanup": "yes",
                     "admin_metadata": {
                         "accessFlag": "N",
                         "contentModel": content_model,
