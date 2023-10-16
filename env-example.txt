@@ -27,6 +27,13 @@ DIMS_URL=
 
 MESSAGE_FILE=message.json
 
+DASH_REST_URL=
+DIMS_URL=
+DASH_LOGIN_EMAIL=
+DASH_LOGIN_PW=
+
+SUBMISSION_PQ_ID=
+
 TEST_DATA_DIRECTORY=/home/etdadm/testdata
 ETD_IN_DIR=/etds/qa/etd_dash_data/in
 DIMS_ENDPOINT=
