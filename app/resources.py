@@ -89,12 +89,12 @@ def define_resources(app):
         result["info"] = result["info"] | res1_json["info"] | res2_json["info"]
 
         return json.dumps(result)
-    
+
     @app.route('/image_only_test')
     def image_only_test():
         result = {"num_failed": 0,
                   "tests_failed": [], "info": {}}
-        
+
         dais_end_to_end_image = ETDDAISEndToEnd()
         end_to_end_result = dais_end_to_end_image.end_to_end_test("image")
         result["num_failed"] = end_to_end_result["num_failed"]
@@ -103,12 +103,12 @@ def define_resources(app):
         result["info"] = result["info"] | end_to_end_result["info"]
 
         return json.dumps(result)
-    
+
     @app.route('/text_only_test')
     def text_only_test():
         result = {"num_failed": 0,
                   "tests_failed": [], "info": {}}
-        
+
         dais_end_to_end_image = ETDDAISEndToEnd()
         end_to_end_result = dais_end_to_end_image.end_to_end_test("text")
         result["num_failed"] = end_to_end_result["num_failed"]
@@ -117,12 +117,12 @@ def define_resources(app):
         result["info"] = result["info"] | end_to_end_result["info"]
 
         return json.dumps(result)
-    
+
     @app.route('/document_only_test')
     def document_only_test():
         result = {"num_failed": 0,
                   "tests_failed": [], "info": {}}
-        
+
         dais_end_to_end_image = ETDDAISEndToEnd()
         end_to_end_result = dais_end_to_end_image.end_to_end_test("document")
         result["num_failed"] = end_to_end_result["num_failed"]
@@ -131,12 +131,12 @@ def define_resources(app):
         result["info"] = result["info"] | end_to_end_result["info"]
 
         return json.dumps(result)
-    
+
     @app.route('/audio_only_test')
     def audio_only_test():
         result = {"num_failed": 0,
                   "tests_failed": [], "info": {}}
-        
+
         dais_end_to_end_image = ETDDAISEndToEnd()
         end_to_end_result = dais_end_to_end_image.end_to_end_test("audio")
         result["num_failed"] = end_to_end_result["num_failed"]
@@ -145,12 +145,12 @@ def define_resources(app):
         result["info"] = result["info"] | end_to_end_result["info"]
 
         return json.dumps(result)
-    
+
     @app.route('/opaque_only_test')
     def opaque_only_test():
         result = {"num_failed": 0,
                   "tests_failed": [], "info": {}}
-        
+
         dais_end_to_end_image = ETDDAISEndToEnd()
         end_to_end_result = dais_end_to_end_image.end_to_end_test("opaque")
         result["num_failed"] = end_to_end_result["num_failed"]
