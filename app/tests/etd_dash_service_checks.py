@@ -39,7 +39,7 @@ class ETDDashServiceChecks():
 
                 # 2. put the test object in the dropbox
                 try:
-                    self.sftp_test_object()
+                    self.sftp_test_object("999999")
                 except Exception as err:
                     result["num_failed"] += 1
                     result["tests_failed"].append("SFTP")
@@ -70,7 +70,7 @@ class ETDDashServiceChecks():
                 self.cleanup_test_object()
                 # 6. put the test object in the dropbox for a second time
                 try:
-                    self.sftp_test_object()
+                    self.sftp_test_object("999999")
                 except Exception as err:
                     result["num_failed"] += 1
                     result["tests_failed"].append("SFTP")
@@ -155,7 +155,7 @@ class ETDDashServiceChecks():
             for filename in glob.glob('/home/etdadm/data/in/proquest*-999999-gsd'):  # noqa: E501
                 shutil.rmtree(filename)
 
-    def sftp_test_object(self):
+    def sftp_test_object(self, base_name):
         # proquest2dash test vars
         private_key = os.getenv("PRIVATE_KEY_PATH")
         remoteSite = os.getenv("dropboxServer")
@@ -163,10 +163,11 @@ class ETDDashServiceChecks():
         archiveDir = "archives/gsd"
         incomingDir = "incoming/gsd"
         zipFile = "submission_999999.zip"
+        newZipFile = "submission_" + base_name + ".zip"
         with pysftp.Connection(host=remoteSite,
                                username=remoteUser,
                                private_key=private_key) as sftp:
             if sftp.exists(f"{archiveDir}/{zipFile}"):
                 sftp.remove(f"{archiveDir}/{zipFile}")
                 sftp.put(f"./testdata/{zipFile}",
-                         f"{incomingDir}/{zipFile}")
+                         f"{incomingDir}/{newZipFile}")
