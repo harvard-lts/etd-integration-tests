@@ -6,11 +6,32 @@ import pysftp
 import glob
 import shutil
 import requests
+import logging
+from logging.handlers import TimedRotatingFileHandler
+
+LOG_FILE_BACKUP_COUNT = 1
+LOG_ROTATION = "midnight"
+log_level = os.getenv("LOG_LEVEL", "DEBUG")
+log_dir = os.getenv("LOG_DIR", "/home/etdadm/logs")
+log_file_path = os.path.join(log_dir, "int_tests.log")
+formatter = logging.Formatter(
+    '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+file_handler = TimedRotatingFileHandler(
+    filename=log_file_path,
+    when=LOG_ROTATION,
+    backupCount=LOG_FILE_BACKUP_COUNT
+)
+logger = logging.getLogger()
+logger.addHandler(file_handler)
+file_handler.setFormatter(formatter)
+logger.setLevel(log_level)
 
 
 class ETDDashServiceChecks():
 
     def dash_deposit_test(self):
+        logger.info(">>>>>>>>>>>>> Starting integration test <<<<<<<<<<<<<")
         result = {"num_failed": 0,
                   "tests_failed": [],
                   "info": {}}
@@ -23,6 +44,7 @@ class ETDDashServiceChecks():
         client = Celery('app')
         client.config_from_object('celeryconfig')
 
+        logger.info(">>>>>>>>>>>>> Reading message file <<<<<<<<<<<<<")
         messagefile = os.environ.get('MESSAGE_FILE', "message.json")
         with open(messagefile) as f:
             messagejson = f.read()
@@ -35,9 +57,11 @@ class ETDDashServiceChecks():
                     feature_flags[DASH_FEATURE_FLAG] == "on"):
 
                 # 1. clear out any old test object
+                logger.info(">>>>>>>>>>>>> Cleanup test object <<<<<<<<<<<<<")
                 self.cleanup_test_object()
 
                 # 2. put the test object in the dropbox
+                logger.info(">>>>>>>>>>>>> SFTP test object <<<<<<<<<<<<<")
                 try:
                     self.sftp_test_object("999999")
                 except Exception as err:
@@ -48,6 +72,7 @@ class ETDDashServiceChecks():
                                        "text": str(err)}}
 
                 # 3. send the test object to dash
+                logger.info(">>>>>>>>> Submit test object to dash <<<<<<<<")
                 client.send_task(name="etd-dash-service.tasks.send_to_dash",
                                  args=[message], kwargs={},
                                  queue=incoming_queue)
@@ -55,6 +80,7 @@ class ETDDashServiceChecks():
                 time.sleep(sleep_secs)  # wait for queue
 
                 rest_url = os.getenv("DASH_REST_URL")
+                logger.info(">>>>>>>>> Check dash for test object <<<<<<<<")
                 resp_text = self.get_dash_object()
                 # 4. count should be 1, shows insertion into dash
                 count = len(json.loads(resp_text))
