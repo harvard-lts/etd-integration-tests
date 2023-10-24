@@ -102,7 +102,7 @@ class ETDDashServiceChecks():
                 self.cleanup_test_object(base_name)
 
                 # 6. put the test object in the dropbox for a second time
-                # generate a random base name for the test object to make 
+                # generate a random base name for the test object to make
                 # duplicate detection more robust
                 base_name = ''.join(random.choices(string.digits, k=10))
                 dupe_dir = os.environ.get('ETD_DUPE_DIR')
