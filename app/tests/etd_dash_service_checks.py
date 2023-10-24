@@ -204,6 +204,12 @@ class ETDDashServiceChecks():
                                username=remoteUser,
                                private_key=private_key) as sftp:
             if sftp.exists(f"{archiveDir}/{zipFile}"):
-                sftp.remove(f"{archiveDir}/{zipFile}")
-                sftp.put(f"./testdata/{zipFile}",
-                         f"{incomingDir}/{newZipFile}")
+                try:
+                    sftp.remove(f"{archiveDir}/{zipFile}")
+                    sftp.put(f"./testdata/{zipFile}",
+                             f"{incomingDir}/{newZipFile}")
+                except Exception as err:
+                    logger.error(f"SFTP error: {err}")
+            # the file doesn't exist, log error.
+            else:
+                logger.error(f"{archiveDir}/{zipFile} does not exist.")
