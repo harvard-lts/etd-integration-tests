@@ -4,28 +4,12 @@ import shutil
 from datetime import datetime
 import requests
 import logging
-from logging.handlers import TimedRotatingFileHandler
-
-LOG_FILE_BACKUP_COUNT = 1
-LOG_ROTATION = "midnight"
-log_level = os.getenv("LOG_LEVEL", "DEBUG")
-log_dir = os.getenv("LOG_DIR", "/home/etdadm/logs")
-log_file_path = os.path.join(log_dir, "int_tests.log")
-formatter = logging.Formatter(
-    '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
-file_handler = TimedRotatingFileHandler(
-    filename=log_file_path,
-    when=LOG_ROTATION,
-    backupCount=LOG_FILE_BACKUP_COUNT
-)
-logger = logging.getLogger()
-logger.addHandler(file_handler)
-file_handler.setFormatter(formatter)
-logger.setLevel(log_level)
 
 
 class ETDDAISEndToEnd():
+
+    def __init__(self):
+        self.logger = logging.getLogger('etd_int_tests')
 
     def end_to_end_test(self, content_model=None):
         result = {"num_failed": 0,
@@ -78,14 +62,14 @@ class ETDDAISEndToEnd():
         dest_path = os.path.join(dest_dir, content_model
                                  + "_submission_integration_test")
         os.makedirs(dest_path, exist_ok=True)
-        logger.debug("Test Path: " + test_path)
-        logger.debug("Dest Path: " + dest_path)
+        self.logger.debug("Test Path: " + test_path)
+        self.logger.debug("Dest Path: " + dest_path)
         try:
             files = os.listdir(test_path)
 
             for file_name in files:
                 dest_path = os.path.join(dest_path, file_name)
-                logger.debug("File Dest Path: " + dest_path)
+                self.logger.debug("File Dest Path: " + dest_path)
                 shutil.copy(os.path.join(test_path, file_name), dest_path)
         except Exception:
             return False

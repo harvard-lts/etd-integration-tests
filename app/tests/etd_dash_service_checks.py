@@ -9,31 +9,15 @@ import requests
 import random
 import string
 import logging
-from logging.handlers import TimedRotatingFileHandler
-
-LOG_FILE_BACKUP_COUNT = 1
-LOG_ROTATION = "midnight"
-log_level = os.getenv("LOG_LEVEL", "DEBUG")
-log_dir = os.getenv("LOG_DIR", "/home/etdadm/logs")
-log_file_path = os.path.join(log_dir, "int_tests.log")
-formatter = logging.Formatter(
-    '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
-file_handler = TimedRotatingFileHandler(
-    filename=log_file_path,
-    when=LOG_ROTATION,
-    backupCount=LOG_FILE_BACKUP_COUNT
-)
-logger = logging.getLogger()
-logger.addHandler(file_handler)
-file_handler.setFormatter(formatter)
-logger.setLevel(log_level)
 
 
 class ETDDashServiceChecks():
 
+    def __init__(self):
+        self.logger = logging.getLogger('etd_int_tests')
+
     def dash_deposit_test(self):
-        logger.info(">>> Starting integration test")
+        self.logger.info(">>> Starting integration test")
         result = {"num_failed": 0,
                   "tests_failed": [],
                   "info": {}}
@@ -46,7 +30,7 @@ class ETDDashServiceChecks():
         client = Celery('app')
         client.config_from_object('celeryconfig')
 
-        logger.info(">>> Read message file")
+        self.logger.info(">>> Read message file")
         messagefile = os.environ.get('MESSAGE_FILE', "message.json")
         with open(messagefile) as f:
             messagejson = f.read()
@@ -60,11 +44,11 @@ class ETDDashServiceChecks():
 
                 base_name = "999999"
                 # 1. clear out any old test object
-                logger.info(">>> Cleanup test object")
+                self.logger.info(">>> Cleanup test object")
                 self.cleanup_test_object(base_name)
 
                 # 2. put the test object in the dropbox
-                logger.info(">>> SFTP test object")
+                self.logger.info(">>> SFTP test object")
                 try:
                     self.sftp_test_object(base_name)
                 except Exception as err:
@@ -73,10 +57,10 @@ class ETDDashServiceChecks():
                     result["info"] = {"Proquest Dropbox sftp failed":
                                       {"status_code": 500,
                                        "text": str(err)}}
-                    logger.error(str(err))
+                    self.logger.error(str(err))
 
                 # 3. send the test object to dash
-                logger.info(">>> Submit test object to dash")
+                self.logger.info(">>> Submit test object to dash")
                 client.send_task(name="etd-dash-service.tasks.send_to_dash",
                                  args=[message], kwargs={},
                                  queue=incoming_queue)
@@ -84,7 +68,7 @@ class ETDDashServiceChecks():
                 time.sleep(sleep_secs)  # wait for queue
 
                 rest_url = os.getenv("DASH_REST_URL")
-                logger.info(">>> Check dash for test object")
+                self.logger.info(">>> Check dash for test object")
                 resp_text = self.get_dash_object()
                 # 4. count should be 1, shows insertion into dash
                 count = len(json.loads(resp_text))
@@ -96,9 +80,9 @@ class ETDDashServiceChecks():
                                        "url": rest_url,
                                        "count": count,
                                        "text": resp_text}}
-                    logger.error("Count is not 1: " + resp_text)
+                    self.logger.error("Count is not 1: " + resp_text)
                 # 5. cleanup the test object from the filesystem
-                logger.info(">>> Clean up test object")
+                self.logger.info(">>> Clean up test object")
                 self.cleanup_test_object(base_name)
 
                 # 6. put the test object in the dropbox for a second time
@@ -111,7 +95,7 @@ class ETDDashServiceChecks():
                                      (f'{dupe_dir}/{dupe_name_pattern}'))
 
                 try:
-                    logger.info(">>> SFTP duplicate test object")
+                    self.logger.info(">>> SFTP duplicate test object")
                     self.sftp_test_object(base_name)
                 except Exception as err:
                     result["num_failed"] += 1
@@ -119,12 +103,12 @@ class ETDDashServiceChecks():
                     result["info"] = {"Proquest Dropbox sftp failed":
                                       {"status_code": 500,
                                        "text": str(err)}}
-                    logger.error(str(err))
+                    self.logger.error(str(err))
                 client.send_task(name="etd-dash-service.tasks.send_to_dash",
                                  args=[message], kwargs={},
                                  queue=incoming_queue)
                 time.sleep(sleep_secs)  # wait for queue
-                logger.info(">>> Check dash for duplicate test object")
+                self.logger.info(">>> Check dash for duplicate test object")
                 resp_text = self.get_dash_object()
                 count = len(json.loads(resp_text))
 
@@ -137,7 +121,7 @@ class ETDDashServiceChecks():
                                        "url": rest_url,
                                        "count": count,
                                        "text": resp_text}}
-                    logger.error("Count is 2: " + resp_text)
+                    self.logger.error("Count is 2: " + resp_text)
 
                 # 8. check the dupe directory to make sure
                 # the test object is there
@@ -154,7 +138,7 @@ class ETDDashServiceChecks():
                                        str(post_dupe_count)}}
 
                 # 9. delete the test object from dash
-                logger.info(">>> Delete duplicate test object from dash")
+                self.logger.info(">>> Delete duplicate test object from dash")
                 if resp_text != "[]":
                     uuid = json.loads(resp_text)[0]["uuid"]
                     url = f"{rest_url}/items/{uuid}"
@@ -172,10 +156,10 @@ class ETDDashServiceChecks():
                                            "uuid": uuid,
                                            "session_key": session_key,
                                            "text": "Delete failed"}}
-                        logger.error("Delete failed: " + response.text)
+                        self.logger.error("Delete failed: " + response.text)
 
                 # 10. cleanup the test object from the filesystem
-                logger.info(">>> Clean up duplicate test object")
+                self.logger.info(">>> Clean up duplicate test object")
                 self.cleanup_test_object(base_name)
 
             else:
@@ -239,4 +223,4 @@ class ETDDashServiceChecks():
                 sftp.put(f"./testdata/{zipFile}",
                          f"{incomingDir}/{newZipFile}")
             except Exception as err:
-                logger.error(f"SFTP error: {err}")
+                self.logger.error(f"SFTP error: {err}")
