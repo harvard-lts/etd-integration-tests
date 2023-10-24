@@ -203,13 +203,12 @@ class ETDDashServiceChecks():
         with pysftp.Connection(host=remoteSite,
                                username=remoteUser,
                                private_key=private_key) as sftp:
+            # remove any existing test object
             if sftp.exists(f"{archiveDir}/{zipFile}"):
-                try:
-                    sftp.remove(f"{archiveDir}/{zipFile}")
-                    sftp.put(f"./testdata/{zipFile}",
-                             f"{incomingDir}/{newZipFile}")
-                except Exception as err:
-                    logger.error(f"SFTP error: {err}")
-            # the file doesn't exist, log error.
-            else:
-                logger.error(f"{archiveDir}/{zipFile} does not exist.")
+                sftp.remove(f"{archiveDir}/{zipFile}")
+            # sftp test object to incoming dir
+            try:
+                sftp.put(f"./testdata/{zipFile}",
+                         f"{incomingDir}/{newZipFile}")
+            except Exception as err:
+                logger.error(f"SFTP error: {err}")
