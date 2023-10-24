@@ -44,7 +44,7 @@ class ETDDashServiceChecks():
         client = Celery('app')
         client.config_from_object('celeryconfig')
 
-        logger.info(">>> Reading message file")
+        logger.info(">>> Read message file")
         messagefile = os.environ.get('MESSAGE_FILE', "message.json")
         with open(messagefile) as f:
             messagejson = f.read()
@@ -70,6 +70,7 @@ class ETDDashServiceChecks():
                     result["info"] = {"Proquest Dropbox sftp failed":
                                       {"status_code": 500,
                                        "text": str(err)}}
+                    logger.error(str(err))
 
                 # 3. send the test object to dash
                 logger.info(">>> Submit test object to dash")
@@ -92,6 +93,7 @@ class ETDDashServiceChecks():
                                        "url": rest_url,
                                        "count": count,
                                        "text": resp_text}}
+                    logger.error("Count is not 1: " + resp_text)
                 # 5. cleanup the test object from the filesystem
                 logger.info(">>> Clean up test object")
                 self.cleanup_test_object()
@@ -105,6 +107,7 @@ class ETDDashServiceChecks():
                     result["info"] = {"Proquest Dropbox sftp failed":
                                       {"status_code": 500,
                                        "text": str(err)}}
+                    logger.error(str(err))
                 client.send_task(name="etd-dash-service.tasks.send_to_dash",
                                  args=[message], kwargs={},
                                  queue=incoming_queue)
@@ -121,6 +124,7 @@ class ETDDashServiceChecks():
                                        "url": rest_url,
                                        "count": count,
                                        "text": resp_text}}
+                    logger.error("Count is 2: " + resp_text)
 
                 # 8. delete the test object from dash
                 logger.info(">>> Delete duplicate test object from dash")
@@ -141,6 +145,7 @@ class ETDDashServiceChecks():
                                            "uuid": uuid,
                                            "session_key": session_key,
                                            "text": "Delete failed"}}
+                        logger.error("Delete failed: " + response.text)
                 # 8. cleanup the test object from the filesystem
                 logger.info(">>> Clean up duplicate test object")
                 self.cleanup_test_object()
