@@ -13,6 +13,7 @@ services:
     volumes:
       - './:/home/etdadm'
       - '/tmp/etd_dash_data/in:/home/etdadm/data/in'
+      - '/tmp/etd_dash_data/dupe:/home/etdadm/data/dupe'
       - './message.json:/home/etdadm/message.json'
     env_file:
       - './.env'
