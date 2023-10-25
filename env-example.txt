@@ -1,5 +1,6 @@
 APP_VERSION=0.0.1
-APP_LOG_LEVEL=INFO
+APP_LOG_LEVEL=DEBUG
+LOG_DIR=/home/etdadm/logs
 
 # MongoDB info
 MONGO_URL=mongodb://USERNAME:PASSWORD@mongo-dev-1.lts.harvard.edu:27072,mongo-dev-2.lts.harvard.edu:27072,mongo-dev-arbiter.lts.harvard.edu:27072/?replicaSet=devrs&authSource=etdadm-dev
@@ -38,4 +39,3 @@ TEST_DATA_DIRECTORY=/home/etdadm/testdata
 ETD_IN_DIR=/etds/qa/etd_dash_data/in
 ETD_DUPE_DIR=/etds/qa/etd_dash_data/dupe
 DIMS_ENDPOINT=
-
