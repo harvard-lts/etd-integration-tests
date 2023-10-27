@@ -248,7 +248,7 @@ class ETDDashServiceChecks():
                     mapfile = f.read()
                     # make sure contents of mapfile are exactly
                     # sub_id + " " + handle
-                    if mapfile != ''.join(sub_id, " ", handle, "\n"):
+                    if mapfile != ''.join([sub_id, " ", handle, "\n"]):
                         result["num_failed"] += 1
                         result["tests_failed"].append("MAPFILE_CONTENTS")  # noqa: E501
                         result["info"] = {"Mapfile contents incorrect":
