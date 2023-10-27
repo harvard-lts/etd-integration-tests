@@ -70,6 +70,10 @@ class ETDDashServiceChecks():
                 rest_url = os.getenv("DASH_REST_URL")
                 self.logger.info(">>> Check dash for test object")
                 resp_text = self.get_dash_object()
+
+                # log resp_text for debugging
+                self.logger.debug(">>> Dash object: " + resp_text)
+
                 # 4. count should be 1, shows insertion into dash
                 count = len(json.loads(resp_text))
                 if count != 1:

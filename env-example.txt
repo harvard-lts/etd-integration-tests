@@ -38,4 +38,5 @@ SUBMISSION_PQ_ID=
 TEST_DATA_DIRECTORY=/home/etdadm/testdata
 ETD_IN_DIR=/etds/qa/etd_dash_data/in
 ETD_DUPE_DIR=/etds/qa/etd_dash_data/dupe
+ETD_OUT_DIR=/etds/qa/etd_dash_data/out
 DIMS_ENDPOINT=
