@@ -101,7 +101,7 @@ class ETDDashServiceChecks():
                                       {"status_code": 500,
                                        "text": f"Mapfile not found: {mapfile_path}"}}  # noqa: E501
                     self.logger.error(f"Mapfile not found: {mapfile_path}")
-                
+
                 # 5. count should be 1, shows insertion into dash
                 count = len(json.loads(resp_text))
                 if count != 1:
