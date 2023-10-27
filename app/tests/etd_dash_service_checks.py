@@ -92,7 +92,7 @@ class ETDDashServiceChecks():
                                 result["info"] = {"Mapfile contents incorrect":
                                                   {"status_code": 500,
                                                    "text": f"Mapfile: {mapfile_path}"}}  # noqa: E501
-                                self.logger.error(f"Mapfile contents incorrect: {mapfile_path}")  # noqa: E501
+                                self.logger.error(f"Mapfile contents incorrect: {mapfile_path} contents: {mapfile}")  # noqa: E501
                 else:
                     # mapfile not found, record error result
                     result["num_failed"] += 1
