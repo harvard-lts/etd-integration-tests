@@ -70,37 +70,11 @@ class ETDDashServiceChecks():
                 rest_url = os.getenv("DASH_REST_URL")
                 self.logger.info(">>> Check dash for test object")
                 resp_text = self.get_dash_object()
-
-                # 4. check that mapfile exists and contains the correct
-                # handle
-                # log resp_text for debugging
+                # log resp_text for debugging                
                 self.logger.debug(">>> Dash object: " + resp_text)
-                handle = json.loads(resp_text)[0]["handle"]
-                sub_id = f"submission_{base_name}"
-                # read mapfile in out/ directory
-                out_dir = os.environ.get('ETD_OUT_DIR')
-                mapfile_path = f'{out_dir}/proquest*-{base_name}-gsd/mapfile'
-                if glob.glob(mapfile_path):
-                    for filename in glob.glob(mapfile_path):
-                        with open(filename) as f:
-                            mapfile = f.read()
-                            # make sure contents of mapfile are exactly
-                            # sub_id + " " + handle
-                            if mapfile != sub_id + " " + handle:
-                                result["num_failed"] += 1
-                                result["tests_failed"].append("MAPFILE_CONTENTS")  # noqa: E501
-                                result["info"] = {"Mapfile contents incorrect":
-                                                  {"status_code": 500,
-                                                   "text": f"Mapfile: {mapfile_path}"}}  # noqa: E501
-                                self.logger.error(f"Mapfile contents incorrect: {mapfile_path} contents: {mapfile}")  # noqa: E501
-                else:
-                    # mapfile not found, record error result
-                    result["num_failed"] += 1
-                    result["tests_failed"].append("MAPFILE_NOT_FOUND")
-                    result["info"] = {"Mapfile not found":
-                                      {"status_code": 500,
-                                       "text": f"Mapfile not found: {mapfile_path}"}}  # noqa: E501
-                    self.logger.error(f"Mapfile not found: {mapfile_path}")
+
+                # 4. validate mapfile
+                self.validate_mapfile(resp_text, base_name, result)
 
                 # 5. count should be 1, shows insertion into dash
                 count = len(json.loads(resp_text))
@@ -260,3 +234,32 @@ class ETDDashServiceChecks():
     # Method to return a random string of 10 digits
     def random_digit_string(self):
         return ''.join(random.choices(string.digits, k=10))
+
+    # Method to validate mapfile for test object.
+    def validate_mapfile(self, resp_text, base_name, result):
+        handle = json.loads(resp_text)[0]["handle"]
+        sub_id = f"submission_{base_name}"
+        # read mapfile in out/ directory
+        out_dir = os.environ.get('ETD_OUT_DIR')
+        mapfile_path = f'{out_dir}/proquest*-{base_name}-gsd/mapfile'
+        if glob.glob(mapfile_path):
+            for filename in glob.glob(mapfile_path):
+                with open(filename) as f:
+                    mapfile = f.read()
+                    # make sure contents of mapfile are exactly
+                    # sub_id + " " + handle
+                    if mapfile != ''.join(sub_id, " ", handle, "\n"):
+                        result["num_failed"] += 1
+                        result["tests_failed"].append("MAPFILE_CONTENTS")  # noqa: E501
+                        result["info"] = {"Mapfile contents incorrect":
+                                          {"status_code": 500,
+                                           "text": f"Mapfile: {mapfile_path}"}}  # noqa: E501
+                        self.logger.error(f"Mapfile contents incorrect: {mapfile_path} contents: {mapfile}")  # noqa: E501
+        else:
+            # mapfile not found, record error result
+            result["num_failed"] += 1
+            result["tests_failed"].append("MAPFILE_NOT_FOUND")
+            result["info"] = {"Mapfile not found":
+                              {"status_code": 500,
+                               "text": f"Mapfile not found: {mapfile_path}"}}  # noqa: E501
+            self.logger.error(f"Mapfile not found: {mapfile_path}")
