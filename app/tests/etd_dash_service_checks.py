@@ -42,7 +42,7 @@ class ETDDashServiceChecks():
             if (DASH_FEATURE_FLAG in feature_flags and
                     feature_flags[DASH_FEATURE_FLAG] == "on"):
 
-                base_name = "999999"
+                base_name = self.random_digit_string()
                 # 1. clear out any old test object
                 self.logger.info(">>> Cleanup test object")
                 self.cleanup_test_object(base_name)
@@ -70,7 +70,14 @@ class ETDDashServiceChecks():
                 rest_url = os.getenv("DASH_REST_URL")
                 self.logger.info(">>> Check dash for test object")
                 resp_text = self.get_dash_object()
-                # 4. count should be 1, shows insertion into dash
+                # log resp_text for debugging
+                self.logger.debug(">>> Dash object: " + resp_text)
+
+                # 4. validate mapfile
+                self.logger.info(">>> Validate test object mapfile")
+                self.validate_mapfile(resp_text, base_name, result)
+
+                # 5. count should be 1, shows insertion into dash
                 count = len(json.loads(resp_text))
                 if count != 1:
                     result["num_failed"] += 1
@@ -81,14 +88,14 @@ class ETDDashServiceChecks():
                                        "count": count,
                                        "text": resp_text}}
                     self.logger.error("Count is not 1: " + resp_text)
-                # 5. cleanup the test object from the filesystem
+                # 6. cleanup the test object from the filesystem
                 self.logger.info(">>> Clean up test object")
                 self.cleanup_test_object(base_name)
 
-                # 6. put the test object in the dropbox for a second time
+                # 7. put the test object in the dropbox for a second time
                 # generate a random base name for the test object to make
                 # duplicate detection more robust
-                base_name = ''.join(random.choices(string.digits, k=10))
+                base_name = self.random_digit_string()
                 dupe_dir = os.environ.get('ETD_DUPE_DIR')
                 dupe_name_pattern = "proquest*-" + base_name + "-gsd_*"
                 pre_dupe_count = len(glob.glob
@@ -112,7 +119,7 @@ class ETDDashServiceChecks():
                 resp_text = self.get_dash_object()
                 count = len(json.loads(resp_text))
 
-                # 7. count shouldn't be 2, no duplicate insertion allowed
+                # 8. count shouldn't be 2, no duplicate insertion allowed
                 if count == 2:
                     result["num_failed"] += 1
                     result["tests_failed"].append("DASH")
@@ -123,7 +130,7 @@ class ETDDashServiceChecks():
                                        "text": resp_text}}
                     self.logger.error("Count is 2: " + resp_text)
 
-                # 8. check the dupe directory to make sure
+                # 9. check the dupe directory to make sure
                 # the test object is there
                 post_dupe_count = len(glob.glob
                                       (f'{dupe_dir}/{dupe_name_pattern}'))
@@ -137,7 +144,7 @@ class ETDDashServiceChecks():
                                        str(pre_dupe_count + 1) + " Found: " +
                                        str(post_dupe_count)}}
 
-                # 9. delete the test object from dash
+                # 10. delete the test object from dash
                 self.logger.info(">>> Delete duplicate test object from dash")
                 if resp_text != "[]":
                     uuid = json.loads(resp_text)[0]["uuid"]
@@ -158,7 +165,7 @@ class ETDDashServiceChecks():
                                            "text": "Delete failed"}}
                         self.logger.error("Delete failed: " + response.text)
 
-                # 10. cleanup the test object from the filesystem
+                # 11. cleanup the test object from the filesystem
                 self.logger.info(">>> Clean up duplicate test object")
                 self.cleanup_test_object(base_name)
 
@@ -224,3 +231,47 @@ class ETDDashServiceChecks():
                          f"{incomingDir}/{newZipFile}")
             except Exception as err:
                 self.logger.error(f"SFTP error: {err}")
+
+    # Method to return a random string of 10 digits
+    def random_digit_string(self):
+        return ''.join(random.choices(string.digits, k=10))
+
+    # Method to validate mapfile for test object.
+    def validate_mapfile(self, resp_text, base_name, result):
+        """
+        Validates the contents of the mapfile generated for a submission.
+
+        Args:
+            resp_text (str): The response text from the API call.
+            base_name (str): The base name of the submission.
+            result (dict): The dictionary containing the test results.
+
+        Returns:
+            None
+        """
+        handle = json.loads(resp_text)[0]["handle"]
+        sub_id = f"submission_{base_name}"
+        # read mapfile in out/ directory
+        out_dir = os.environ.get('ETD_OUT_DIR')
+        mapfile_path = f'{out_dir}/proquest*-{base_name}-gsd/mapfile'
+        if glob.glob(mapfile_path):
+            for filename in glob.glob(mapfile_path):
+                with open(filename) as f:
+                    mapfile = f.read()
+                    # make sure contents of mapfile are exactly
+                    # sub_id + " " + handle
+                    if mapfile != ''.join([sub_id, " ", handle, "\n"]):
+                        result["num_failed"] += 1
+                        result["tests_failed"].append("MAPFILE_CONTENTS")  # noqa: E501
+                        result["info"] = {"Mapfile contents incorrect":
+                                          {"status_code": 500,
+                                           "text": f"Mapfile: {mapfile_path}"}}  # noqa: E501
+                        self.logger.error(f"Mapfile contents incorrect: {mapfile_path} contents: {mapfile}")  # noqa: E501
+        else:
+            # mapfile not found, record error result
+            result["num_failed"] += 1
+            result["tests_failed"].append("MAPFILE_NOT_FOUND")
+            result["info"] = {"Mapfile not found":
+                              {"status_code": 500,
+                               "text": f"Mapfile not found: {mapfile_path}"}}  # noqa: E501
+            self.logger.error(f"Mapfile not found: {mapfile_path}")
