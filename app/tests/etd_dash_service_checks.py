@@ -74,6 +74,7 @@ class ETDDashServiceChecks():
                 self.logger.debug(">>> Dash object: " + resp_text)
 
                 # 4. validate mapfile
+                self.logger.info(">>> Validate test object mapfile")
                 self.validate_mapfile(resp_text, base_name, result)
 
                 # 5. count should be 1, shows insertion into dash
@@ -237,6 +238,17 @@ class ETDDashServiceChecks():
 
     # Method to validate mapfile for test object.
     def validate_mapfile(self, resp_text, base_name, result):
+        """
+        Validates the contents of the mapfile generated for a submission.
+
+        Args:
+            resp_text (str): The response text from the API call.
+            base_name (str): The base name of the submission.
+            result (dict): The dictionary containing the test results.
+
+        Returns:
+            None
+        """
         handle = json.loads(resp_text)[0]["handle"]
         sub_id = f"submission_{base_name}"
         # read mapfile in out/ directory
