@@ -11,17 +11,14 @@ class ETDDAISEndToEnd():
     def __init__(self):
         self.logger = logging.getLogger('etd_int_tests')
 
-    def end_to_end_test(self, content_model=None):
+    def end_to_end_test(self):
         result = {"num_failed": 0,
                   "tests_failed": [],
                   "info": {}}
 
         try:
             # Copy test submission file from data dir to ETD 'in' directory
-            if content_model is None:
-                dest_path = self.__copy_test_submission()
-            else:
-                dest_path = self.__copy_test_submission_cm(content_model)
+            dest_path = self.__copy_test_submission()
         except Exception as e:
             result["num_failed"] += 1
             result["tests_failed"].append("Copy failed with exception")
@@ -33,7 +30,7 @@ class ETDDAISEndToEnd():
         payload_data = {}
         # Build DRS Admin MD
         if dest_path:
-            payload_data = self.__build_drs_admin_md(dest_path, content_model)
+            payload_data = self.__build_drs_admin_md(dest_path)
         else:
             result["num_failed"] += 1
             result["tests_failed"].append("Copy failed")
@@ -54,79 +51,79 @@ class ETDDAISEndToEnd():
 
         return result
 
-    def __copy_test_submission_cm(self, content_model):
-        test_dir = os.getenv("TEST_DATA_DIRECTORY")
-        test_path = os.path.join(test_dir, content_model)
-
-        dest_dir = os.getenv("ETD_IN_DIR")
-        dest_path = os.path.join(dest_dir, content_model
-                                 + "_submission_integration_test")
-        os.makedirs(dest_path, exist_ok=True)
-        self.logger.debug("Test Path: " + test_path)
-        self.logger.debug("Dest Path: " + dest_path)
-        try:
-            files = os.listdir(test_path)
-
-            for file_name in files:
-                dest_path = os.path.join(dest_path, file_name)
-                self.logger.debug("File Dest Path: " + dest_path)
-                shutil.copy(os.path.join(test_path, file_name), dest_path)
-        except Exception:
-            return False
-
-        if os.path.isfile(dest_path):
-            return dest_path
-        return False
-
     def __copy_test_submission(self):
-        raise Exception("NOT YET IMPLEMENTED")
         test_dir = os.getenv("TEST_DATA_DIRECTORY")
         zip_file = "submission_999999.zip"
         test_path = os.path.join(test_dir, zip_file)
 
         dest_dir = os.getenv("ETD_IN_DIR")
         dest_path = os.path.join(dest_dir,
-                                 "submission_integration_test", zip_file)
-
+                                 "submission_integration_test")
+        os.makedirs(dest_path, exist_ok=True)
         try:
             shutil.copy(test_path, dest_path)
         except Exception:
             return False
 
-        if os.path.isfile(dest_path):
-            return dest_path
+        if os.path.isfile(os.path.join(dest_path, zip_file)):
+            return os.path.join(dest_path, zip_file)
         return False
 
-    def __build_drs_admin_md(self, dest_path, content_model):
+    def __build_drs_admin_md(self, dest_path):
         # Create a unique OSN based on the timestamp
-        unique_osn = "ETD_TEST_" + content_model + "_" + \
-            str(int(datetime.now().timestamp()))
+        osn_unique_appender = str(int(datetime.now().timestamp()))
 
-        payload_data = {"package_id": unique_osn,
+        thesis_name = "0521Yolandayuanlupeng_finalNaming Expeditor.pdf"
+        license_name = "setup_2E592954-F85C-11EA-ABB1-E61AE629DA94.pdf"
+        file_info = {
+            thesis_name: {
+                "modified_file_name":
+                "0521Yolandayuanlupeng_finalNaming_Expeditor.pdf",
+                "file_role": "ARCHIVAL_MASTER",
+                "object_role": "THESIS",
+                "object_osn": "ETD_THESIS_test_2023-05_PQ_TEST1234_"
+                + osn_unique_appender,
+                "file_osn": "ETD_THESIS_test_2023-05_PQ_TEST1234_"
+                + osn_unique_appender + "_1"
+            },
+            license_name: {
+                "modified_file_name":
+                "setup_2E592954-F85C-11EA-ABB1-E61AE629DA94.pdf",
+                "file_role": "LICENSE",
+                "object_role": "LICENSE",
+                "object_osn": "ETD_LICENSE_test_2023-05_PQ_TEST1234_"
+                + osn_unique_appender,
+                "file_osn": "ETD_LICENSE_test_2023-05_PQ_TEST1234_"
+                + osn_unique_appender + "_1"
+            },
+            "mets.xml": {
+                "modified_file_name": "mets.xml",
+                "file_role": "DOCUMENTATION",
+                "object_role": "DOCUMENTATION",
+                "object_osn": "ETD_DOCUMENTATION_test_2023-05_PQ_TEST1234_"
+                + osn_unique_appender,
+                "file_osn": "ETD_DOCUMENTATION_test_2023-05_PQ_TEST1234_"
+                + osn_unique_appender + "_1"
+            }
+        }
+        payload_data = {"package_id": "ETD_TESTING_" + osn_unique_appender,
                         "fs_source_path": dest_path,
                         "s3_path": "",
                         "s3_bucket_name": "",
                         "depositing_application": "ETD",
                         "admin_metadata": {
-                            "accessFlag": "N",
-                            "contentModel": content_model,
                             "depositingSystem": "ETD",
-                            "firstGenerationInDrs": "yes",
-                            "usageClass": "LOWUSE",
-                            "storageClass": "AR",
                             "ownerCode": "HUL.TEST",
                             "billingCode": "HUL.TEST.BILL_0001",
-                            "resourceNamePattern": "{n}",
                             "urnAuthorityPath": "HUL.TEST",
-                            "depositAgent": "dimsdts1",
-                            "depositAgentEmail": "DTS@HU.onmicrosoft.com",
-                            "successEmail": "DTS@HU.onmicrosoft.com",
-                            "failureEmail": "DTS@HU.onmicrosoft.com",
-                            "successMethod": "all",
                             "original_queue": "test",
                             'task_name': "test",
                             "retry_count": 0,
-                            "mmsid": "12345"
+                            "mmsid": "12345",
+                            "dash_id": "30522803",
+                            "pq_id": "PQ-TEST1234",
+                            "alma_id": "99156631569803941",
+                            "file_info": file_info
                         }
                         }
         return payload_data
