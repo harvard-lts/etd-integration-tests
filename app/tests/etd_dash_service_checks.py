@@ -144,6 +144,22 @@ class ETDDashServiceChecks():
                                        str(pre_dupe_count + 1) + " Found: " +
                                        str(post_dupe_count)}}
 
+                # check that the there is no output directory for the dupe
+                out_dir = os.environ.get('ETD_OUT_DIR')
+                out_dir_pattern = "proquest*-" + base_name + "-gsd"
+                out_dir_count = len(glob.glob
+                                    (f'{out_dir}/{out_dir_pattern}'))
+                if out_dir_count != 0:
+                    result["num_failed"] += 1
+                    result["tests_failed"].append("DUPLICATE_IN_OUTPUT_DIR")
+                    result["info"] = {"DASH dupe deletion from output dir \
+                                       failed":
+                                      {"status_code": 500,
+                                       "text": "Output directory found:" +
+                                       dupe_name_pattern + ". Expected: 0" +
+                                       " Found: " +
+                                       str(out_dir_count)}}
+
                 # 10. delete the test object from dash
                 self.logger.info(">>> Delete duplicate test object from dash")
                 if resp_text != "[]":
