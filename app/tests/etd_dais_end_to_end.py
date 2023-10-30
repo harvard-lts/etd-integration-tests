@@ -106,7 +106,7 @@ class ETDDAISEndToEnd():
                 + osn_unique_appender + "_1"
             }
         }
-        payload_data = {"package_id": "ETD_TESTING",
+        payload_data = {"package_id": "ETD_TESTING_" + osn_unique_appender,
                         "fs_source_path": dest_path,
                         "s3_path": "",
                         "s3_bucket_name": "",
