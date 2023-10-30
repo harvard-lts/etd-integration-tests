@@ -151,7 +151,8 @@ class ETDDashServiceChecks():
                 if out_dir_count != 0:
                     result["num_failed"] += 1
                     result["tests_failed"].append("DUPLICATE_IN_OUTPUT_DIR")
-                    result["info"] = {"DASH dupe deletion from output dir failed":
+                    result["info"] = {"DASH dupe deletion from output dir \
+                                       failed":
                                       {"status_code": 500,
                                        "text": "Output directory found:" +
                                        dupe_name_pattern + ". Expected: 0" +
