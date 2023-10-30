@@ -65,8 +65,8 @@ class ETDDAISEndToEnd():
         except Exception:
             return False
 
-        if os.path.isfile(dest_path):
-            return dest_path
+        if os.path.isfile(os.path.join(dest_path, zip_file)):
+            return os.path.join(dest_path, zip_file)
         return False
 
     def __build_drs_admin_md(self, dest_path):
