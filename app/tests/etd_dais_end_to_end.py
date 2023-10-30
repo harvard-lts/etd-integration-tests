@@ -59,7 +59,7 @@ class ETDDAISEndToEnd():
         dest_dir = os.getenv("ETD_IN_DIR")
         dest_path = os.path.join(dest_dir,
                                  "submission_integration_test", zip_file)
-        os.makedirs(dest_path, exist_ok=True)
+        os.makedirs(os.path.dirname(dest_path), exist_ok=True)
         try:
             shutil.copy(test_path, dest_path)
         except Exception:
@@ -115,6 +115,7 @@ class ETDDAISEndToEnd():
                             "depositingSystem": "ETD",
                             "ownerCode": "HUL.TEST",
                             "billingCode": "HUL.TEST.BILL_0001",
+                            ""
                             "original_queue": "test",
                             'task_name': "test",
                             "retry_count": 0,
