@@ -59,7 +59,7 @@ class ETDDAISEndToEnd():
         dest_dir = os.getenv("ETD_IN_DIR")
         dest_path = os.path.join(dest_dir,
                                  "submission_integration_test", zip_file)
-
+        os.makedirs(dest_path, exist_ok=True)
         try:
             shutil.copy(test_path, dest_path)
         except Exception:
