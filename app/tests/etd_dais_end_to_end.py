@@ -77,30 +77,32 @@ class ETDDAISEndToEnd():
         license_name = "setup_2E592954-F85C-11EA-ABB1-E61AE629DA94.pdf"
         file_info = {
             thesis_name: {
-                "modified_file_name": "0521Yolandayuanlupeng_finalNaming_Expeditor.pdf",
+                "modified_file_name":
+                "0521Yolandayuanlupeng_finalNaming_Expeditor.pdf",
                 "file_role": "ARCHIVAL_MASTER",
                 "object_role": "THESIS",
-                "object_osn": "ETD_THESIS_test_2023-05_PQ_TEST1234_" 
+                "object_osn": "ETD_THESIS_test_2023-05_PQ_TEST1234_"
                 + osn_unique_appender,
-                "file_osn": "ETD_THESIS_test_2023-05_PQ_TEST1234_" 
+                "file_osn": "ETD_THESIS_test_2023-05_PQ_TEST1234_"
                 + osn_unique_appender + "_1"
             },
             license_name: {
-                "modified_file_name": "setup_2E592954-F85C-11EA-ABB1-E61AE629DA94.pdf",
+                "modified_file_name":
+                "setup_2E592954-F85C-11EA-ABB1-E61AE629DA94.pdf",
                 "file_role": "LICENSE",
                 "object_role": "LICENSE",
-                "object_osn": "ETD_LICENSE_test_2023-05_PQ_TEST1234_" 
+                "object_osn": "ETD_LICENSE_test_2023-05_PQ_TEST1234_"
                 + osn_unique_appender,
-                "file_osn": "ETD_LICENSE_test_2023-05_PQ_TEST1234_" 
+                "file_osn": "ETD_LICENSE_test_2023-05_PQ_TEST1234_"
                 + osn_unique_appender + "_1"
             },
             "mets.xml": {
                 "modified_file_name": "mets.xml",
                 "file_role": "DOCUMENTATION",
                 "object_role": "DOCUMENTATION",
-                "object_osn": "ETD_DOCUMENTATION_test_2023-05_PQ_TEST1234_" 
+                "object_osn": "ETD_DOCUMENTATION_test_2023-05_PQ_TEST1234_"
                 + osn_unique_appender,
-                "file_osn": "ETD_DOCUMENTATION_test_2023-05_PQ_TEST1234_" 
+                "file_osn": "ETD_DOCUMENTATION_test_2023-05_PQ_TEST1234_"
                 + osn_unique_appender + "_1"
             }
         }
