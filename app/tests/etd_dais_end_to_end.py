@@ -58,8 +58,8 @@ class ETDDAISEndToEnd():
 
         dest_dir = os.getenv("ETD_IN_DIR")
         dest_path = os.path.join(dest_dir,
-                                 "submission_integration_test", zip_file)
-        os.makedirs(os.path.dirname(dest_path), exist_ok=True)
+                                 "submission_integration_test")
+        os.makedirs(dest_path, exist_ok=True)
         try:
             shutil.copy(test_path, dest_path)
         except Exception:
@@ -69,7 +69,7 @@ class ETDDAISEndToEnd():
             return dest_path
         return False
 
-    def __build_drs_admin_md(self, dest_path, content_model):
+    def __build_drs_admin_md(self, dest_path):
         # Create a unique OSN based on the timestamp
         osn_unique_appender = str(int(datetime.now().timestamp()))
 
