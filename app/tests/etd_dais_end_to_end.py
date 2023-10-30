@@ -115,7 +115,7 @@ class ETDDAISEndToEnd():
                             "depositingSystem": "ETD",
                             "ownerCode": "HUL.TEST",
                             "billingCode": "HUL.TEST.BILL_0001",
-                            ""
+                            "urnAuthorityPath": "HUL.TEST",
                             "original_queue": "test",
                             'task_name': "test",
                             "retry_count": 0,
