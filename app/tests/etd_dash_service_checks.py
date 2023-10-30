@@ -146,8 +146,9 @@ class ETDDashServiceChecks():
 
                 # check that the there is no output directory for the dupe
                 out_dir = os.environ.get('ETD_OUT_DIR')
+                out_dir_pattern = "proquest*-" + base_name + "-gsd"
                 out_dir_count = len(glob.glob
-                                    (f'{out_dir}/{dupe_name_pattern}'))
+                                    (f'{out_dir}/{out_dir_pattern}'))
                 if out_dir_count != 0:
                     result["num_failed"] += 1
                     result["tests_failed"].append("DUPLICATE_IN_OUTPUT_DIR")
