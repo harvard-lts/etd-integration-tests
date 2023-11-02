@@ -24,7 +24,6 @@ class ETDAlmaServiceChecks():
 
         FEATURE_FLAGS = "feature_flags"
         DASH_FEATURE_FLAG = "dash_feature_flag"
-        ALMA_FEATURE_FORCE_UPDATE_FLAG = "alma_feature_force_update_flag"
         ALMA_FEATURE_FLAG = "alma_feature_flag"
 
         yyyymmdd = get_date_time_stamp('day')
@@ -34,7 +33,7 @@ class ETDAlmaServiceChecks():
         client.config_from_object('celeryconfig')
 
         self.logger.info(">>> Read message file")
-        messagefile = os.environ.get('MESSAGE_FILE', "message.json")
+        messagefile = os.environ.get('ALMA_MESSAGE_FILE', "alma_message.json")
         with open(messagefile) as f:
             messagejson = f.read()
         message = json.loads(messagejson)
@@ -42,11 +41,10 @@ class ETDAlmaServiceChecks():
         # only run if dash & alma feature flags are on
         if FEATURE_FLAGS in message:
             feature_flags = message[FEATURE_FLAGS]
-            if (DASH_FEATURE_FLAG in feature_flags and
-                    feature_flags[DASH_FEATURE_FLAG] == "on"):
-
-                message[FEATURE_FLAGS][ALMA_FEATURE_FLAG] == "on"
-                message[FEATURE_FLAGS][ALMA_FEATURE_FORCE_UPDATE_FLAG] == "on"
+            if ((DASH_FEATURE_FLAG in feature_flags and
+                    feature_flags[DASH_FEATURE_FLAG] == "on") and
+                    (ALMA_FEATURE_FLAG in feature_flags and
+                     message[FEATURE_FLAGS][ALMA_FEATURE_FLAG] == "on")):
 
                 batch_name = os.getenv('ALMA_BATCH_NAME',
                                        'proquest2023071720-993578-gsd')
