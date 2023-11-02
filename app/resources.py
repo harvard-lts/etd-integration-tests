@@ -90,13 +90,27 @@ def define_resources(app):
 
         return json.dumps(result)
 
-    @app.route('/etd_test')
+    @app.route('/etd_basic_test')
     def etd_test():
         result = {"num_failed": 0,
                   "tests_failed": [], "info": {}}
 
         dais_end_to_end_image = ETDDAISEndToEnd()
-        end_to_end_result = dais_end_to_end_image.end_to_end_test()
+        end_to_end_result = dais_end_to_end_image.end_to_end_documentation_test()
+        result["num_failed"] = end_to_end_result["num_failed"]
+        if len(end_to_end_result["tests_failed"]) > 0:
+            result["tests_failed"].append(end_to_end_result["tests_failed"])
+        result["info"] = result["info"] | end_to_end_result["info"]
+
+        return json.dumps(result)
+    
+    @app.route('/etd_with_images_test')
+    def etd_with_images_test():
+        result = {"num_failed": 0,
+                  "tests_failed": [], "info": {}}
+
+        dais_end_to_end_image = ETDDAISEndToEnd()
+        end_to_end_result = dais_end_to_end_image.end_to_end_images_test()
         result["num_failed"] = end_to_end_result["num_failed"]
         if len(end_to_end_result["tests_failed"]) > 0:
             result["tests_failed"].append(end_to_end_result["tests_failed"])
