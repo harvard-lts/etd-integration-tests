@@ -27,7 +27,7 @@ class ETDAlmaServiceChecks():
         ALMA_FEATURE_FORCE_UPDATE_FLAG = "alma_feature_force_update_flag"
         ALMA_FEATURE_FLAG = "alma_feature_flag"
 
-        yyyymmdd          = get_date_time_stamp('day')
+        yyyymmdd = get_date_time_stamp('day')
         xmlCollectionFile = f'AlmaDeliveryTest_{yyyymmdd}.xml'
 
         client = Celery('app')
@@ -61,8 +61,8 @@ class ETDAlmaServiceChecks():
                 # 3. send the test object to alma
                 self.logger.info(">>> Submit test object to alma")
                 client.send_task(name="etd-alma-service.tasks.send_to_alma",
-                                    args=[message], kwargs={},
-                                    queue=incoming_queue)
+                                 args=[message], kwargs={},
+                                 queue=incoming_queue)
                 sleep_secs = int(os.environ.get('SLEEP_SECS', 30))
                 time.sleep(sleep_secs)  # wait for queue
 
@@ -86,8 +86,8 @@ class ETDAlmaServiceChecks():
                                        "text": "Export not found"}}
                     self.logger.error("Alma Dropbox export failed")
 
-                #5. cleanup the test object from the filesystem
-                self.logger.info(">>> Clean test object")
+                # 5. cleanup the test object from the filesystem
+                self.logger.info(">>> Cleanup test object")
                 self.cleanup_test_object(batch_name)
 
             else:
@@ -101,7 +101,6 @@ class ETDAlmaServiceChecks():
 
         return result
 
-
     def cleanup_test_object(self, base_name):
         if os.path.exists('/home/etdadm/data/in/' + base_name):
             for filename in glob.glob('/home/etdadm/data/in/' + base_name + '/*'):  # noqa: E501
@@ -113,17 +112,16 @@ class ETDAlmaServiceChecks():
                 os.remove(filename)
             for filename in glob.glob('/home/etdadm/data/out/' + base_name):  # noqa: E501
                 shutil.rmtree(filename)
-    
 
     def setup_test_object(self, base_name):
         if not os.path.exists('/home/etdadm/data/in/' + base_name):
             os.mkdir('/home/etdadm/data/in/' + base_name)
         shutil.copy2('/home/etdadm/testdata/alma/in/' + base_name +
-                     '/mets.xml', '/home/etdadm/data/in/' + base_name) # noqa: E501
+                     '/mets.xml', '/home/etdadm/data/in/' + base_name)  # noqa: E501
         if not os.path.exists('/home/etdadm/data/out/' + base_name):
             os.mkdir('/home/etdadm/data/out/' + base_name)
         shutil.copy2('/home/etdadm/testdata/alma/out/' + base_name +
-                     '/mapfile', '/home/etdadm/data/out/' + base_name) # noqa: E501
+                     '/mapfile', '/home/etdadm/data/out/' + base_name)  # noqa: E501
 
     def sftp_check_export(self, base_name):
         # alma service test vars
@@ -132,7 +130,7 @@ class ETDAlmaServiceChecks():
         remoteUser = os.getenv("ALMA_DROPBOX_USER")
         incomingDir = "incoming/"
         exportExists = False
- 
+
         with pysftp.Connection(host=remoteSite,
                                username=remoteUser,
                                private_key=private_key) as sftp:
