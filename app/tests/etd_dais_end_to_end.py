@@ -85,7 +85,7 @@ class ETDDAISEndToEnd():
 
         try:
             # Copy test submission file from data dir to ETD 'in' directory
-            zip_file = "submission_ten_gifs.zip"
+            zip_file = "submission_five_gifs.zip"
             dest_path = self.__copy_test_submission(zip_file, "end_to_end_images_test")
         except Exception as e:
             result["num_failed"] += 1
