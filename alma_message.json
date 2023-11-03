@@ -1,0 +1,10 @@
+{
+    "job_ticket_id": "integration_testing", "integration_test": true,
+    "feature_flags": 
+    {
+        "dash_feature_flag": "on",
+        "alma_feature_flag": "on",
+        "send_to_drs_feature_flag": "off",
+        "drs_holding_record_feature_flag": "off"
+    }
+}

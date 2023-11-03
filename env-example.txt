@@ -40,3 +40,11 @@ ETD_IN_DIR=/etds/qa/etd_dash_data/in
 ETD_DUPE_DIR=/etds/qa/etd_dash_data/dupe
 ETD_OUT_DIR=/etds/qa/etd_dash_data/out
 DIMS_ENDPOINT=
+
+#alma sftp creds
+ALMA_PRIVATE_KEY_PATH=
+ALMA_DROPBOX_SERVER=
+ALMA_DROPBOX_USER=
+ALMA_SERVICE_QUEUE_NAME=etd_in_storage
+ALMA_BATCH_NAME=
+ALMA_MESSAGE_FILE=alma_message.json

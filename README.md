@@ -5,6 +5,7 @@
 ### To start component:
 - clone repository
 - cp .env.example to .env
+- add 'alma_dropbox_rsa_id' and 'known_hosts' from the vault to './.ssh'
 - cp celeryconfig.py.example to celeryconfig.py and put in credentials
 - make sure logs/etd_itests directory exists (need to fix)
 - for test to pass locally, etd_dash_service docker must run locally
