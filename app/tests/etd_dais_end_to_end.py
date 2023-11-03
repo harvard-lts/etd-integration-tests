@@ -125,6 +125,64 @@ class ETDDAISEndToEnd():
                                "text": str(e)}}
 
         return result
+    
+    def end_to_end_opaque_gif_test(self):
+        """
+        This function performs an end-to-end test for the ETD system using
+        image files. It copies a test submission file from the data directory
+        to the ETD 'in' directory, builds DRS Admin MD for the opaque and
+        images, and calls DIMS. It returns a dictionary with the number of
+        failed tests, a list of failed tests, and additional information
+        about the failed tests if any.
+
+        Returns:
+            dict: A dictionary with the following keys:
+                - num_failed (int): The number of failed tests.
+                - tests_failed (list): A list of failed tests.
+                - info (dict): Additional information about the failed tests
+                if any.
+        """
+        result = {"num_failed": 0,
+                  "tests_failed": [],
+                  "info": {}}
+
+        try:
+            # Copy test submission file from data dir to ETD 'in' directory
+            zip_file = "submission_opaque_gif.zip"
+            dest_path = self.__copy_test_submission(
+                zip_file, "end_to_end_opaque_images_test")
+        except Exception as e:
+            result["num_failed"] += 1
+            result["tests_failed"].append("Copy failed with exception")
+            result["info"] = {"Copy failed with exception":
+                              {"status_code": 500,
+                               "text": str(e)}}
+            return result
+
+        payload_data = {}
+        # Build DRS Admin MD
+        if dest_path:
+            payload_data = self. \
+                __build_drs_admin_md_for_opaque_gif(dest_path)
+        else:
+            result["num_failed"] += 1
+            result["tests_failed"].append("Copy failed")
+            result["info"] = {"Copy failed":
+                              {"status_code": 500,
+                               "text": "Copy failed"}}
+            return result
+
+        try:
+            # Call DIMS
+            self.__call_dims(payload_data)
+        except Exception as e:
+            result["num_failed"] += 1
+            result["tests_failed"].append("DIMS call failed")
+            result["info"] = {"DIMS Call failed":
+                              {"status_code": 500,
+                               "text": str(e)}}
+
+        return result
 
     def __copy_test_submission(self, zip_file, test_submission_dir_name):
         test_dir = os.getenv("TEST_DATA_DIRECTORY")
@@ -201,13 +259,95 @@ class ETDDAISEndToEnd():
                         }
         return payload_data
 
+    def __build_drs_admin_md_for_opaque_gif(self, dest_path):
+        # Create a unique OSN based on the timestamp
+        timestamp_appender = str(int(datetime.now().timestamp()))
+
+        thesis_name = "Alfred_S_MArchI_F21 Thesis.pdf"
+        license_name = "setup_2E592954-F85C-11EA-ABB1-E61AE629DA94.pdf"
+        osn_unique_appender = "ETD_THESIS_gsd_2022-05_PQ_28963877_" + timestamp_appender
+        file_info = {
+            thesis_name: {
+                "modified_file_name":
+                "Alfred_S_MArchI_F21_Thesis.pdf",
+                "file_role": "ARCHIVAL_MASTER",
+                "object_role": "THESIS",
+                "object_osn": "ETD_THESIS_" + osn_unique_appender,
+                "file_osn": "ETD_THESIS_" + osn_unique_appender + "_1"
+            },
+            license_name: {
+                "modified_file_name":
+                "setup_2E592954-F85C-11EA-ABB1-E61AE629DA94.pdf",
+                "file_role": "LICENSE",
+                "object_role": "LICENSE",
+                "object_osn": "ETD_LICENSE_" + osn_unique_appender,
+                "file_osn": "ETD_LICENSE_" + osn_unique_appender + "_1"
+            },
+            "mets.xml": {
+                "modified_file_name": "mets.xml",
+                "file_role": "DOCUMENTATION",
+                "object_role": "DOCUMENTATION",
+                "object_osn": "ETD_DOCUMENTATION_" + osn_unique_appender,
+                "file_osn": "ETD_DOCUMENTATION_" + osn_unique_appender + "_1"
+            },
+            "Plan Gifs.zip": {
+                "modified_file_name": "Plan_Gifs.zip",
+                "file_role": "ARCHIVAL_MASTER",
+                "object_role": "THESIS_SUPPLEMENT",
+                "object_osn": "ETD_SUPPLEMENT_" + osn_unique_appender + "_1",
+                "file_osn": "ETD_SUPPLEMENT__" + osn_unique_appender + "_1_1"
+            },
+            "Notation Gifs.zip": {
+                "modified_file_name": "Notation_Gifs.zip",
+                "file_role": "ARCHIVAL_MASTER",
+                "object_role": "THESIS_SUPPLEMENT",
+                "object_osn": "ETD_SUPPLEMENT__" + osn_unique_appender + "_2",
+                "file_osn": "ETD_SUPPLEMENT__" + osn_unique_appender + "_2_1"
+            },
+            "Dance Gifs.zip": {
+                "modified_file_name": "Dance_Gifs.zip",
+                "file_role": "ARCHIVAL_MASTER",
+                "object_role": "THESIS_SUPPLEMENT",
+                "object_osn": "ETD_SUPPLEMENT__" + osn_unique_appender + "_3",
+                "file_osn": "ETD_SUPPLEMENT__" + osn_unique_appender + "_3_1"
+            },
+            "Alfred_S_Model gif.gif": {
+                "modified_file_name": "Alfred_S_Model_gif.gif",
+                "file_role": "ARCHIVAL_MASTER",
+                "object_role": "THESIS_SUPPLEMENT",
+                "object_osn": "ETD_SUPPLEMENT__" + osn_unique_appender + "_4",
+                "file_osn": "ETD_SUPPLEMENT__" + osn_unique_appender + "_4_1"
+            }
+        }
+        payload_data = {"package_id": "ETD_TESTING_" + timestamp_appender,
+                        "fs_source_path": dest_path,
+                        "s3_path": "",
+                        "s3_bucket_name": "",
+                        "depositing_application": "ETD",
+                        "admin_metadata": {
+                            "depositingSystem": "ETD",
+                            "ownerCode": "HUL.TEST",
+                            "billingCode": "HUL.TEST.BILL_0001",
+                            "urnAuthorityPath": "HUL.TEST",
+                            "original_queue": "test",
+                            'task_name': "test",
+                            "retry_count": 0,
+                            "mmsid": "12345",
+                            "dash_id": "TEST1234",
+                            "pq_id": "PQ-28963877",
+                            "alma_id": "99156631569803941",
+                            "file_info": file_info
+                        }
+                        }
+        return payload_data
+    
     def __build_drs_admin_md_for_images(self, dest_path):
         # Create a unique OSN based on the timestamp
         timestamp_appender = str(int(datetime.now().timestamp()))
 
         thesis_name = "20210524_Thesis Archival Submission_JB Signed.pdf"
         license_name = "setup_2E592954-F85C-11EA-ABB1-E61AE629DA94.pdf"
-        osn_unique_appender = "test_2021-05_PQ_28542548" + timestamp_appender
+        osn_unique_appender = "test_2021-05_PQ_28542548_" + timestamp_appender
         file_info = {
             thesis_name: {
                 "modified_file_name":
@@ -283,7 +423,7 @@ class ETDDAISEndToEnd():
                             "retry_count": 0,
                             "mmsid": "12345",
                             "dash_id": "TEST1234",
-                            "pq_id": "PQ-30522803",
+                            "pq_id": "PQ-28542548",
                             "alma_id": "99156631569803941",
                             "file_info": file_info
                         }
