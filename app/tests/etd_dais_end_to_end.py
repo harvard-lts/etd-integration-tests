@@ -16,7 +16,7 @@ class ETDDAISEndToEnd():
         This function performs an end-to-end test for a basic ETD.
         It copies a test submission file from the data directory to the
         ETD 'in' directory, builds DRS Admin MD for documentation, and calls
-        DIMS to complete the process. If any of these steps fail, the 
+        DIMS to complete the process. If any of these steps fail, the
         function returns a dictionary with information about the failure.
 
         Returns:
