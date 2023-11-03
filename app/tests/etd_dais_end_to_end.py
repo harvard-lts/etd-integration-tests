@@ -14,10 +14,10 @@ class ETDDAISEndToEnd():
     def end_to_end_documentation_test(self):
         """
         This function performs an end-to-end test for a basic ETD.
-        It copies a test submission file from the data directory to the ETD 'in' directory,
-        builds DRS Admin MD for documentation, and calls DIMS to complete the process.
-        If any of these steps fail, the function returns a dictionary with information
-        about the failure.
+        It copies a test submission file from the data directory to the
+        ETD 'in' directory, builds DRS Admin MD for documentation, and calls
+        DIMS to complete the process. If any of these steps fail, the 
+        function returns a dictionary with information about the failure.
 
         Returns:
             A dictionary with the following keys:
@@ -32,7 +32,9 @@ class ETDDAISEndToEnd():
         try:
             # Copy test submission file from data dir to ETD 'in' directory
             zip_file = "submission_999999.zip"
-            dest_path = self.__copy_test_submission(zip_file, "end_to_end_documentation_test")
+            dest_path = self.__copy_test_submission(
+                zip_file,
+                "end_to_end_documentation_test")
         except Exception as e:
             result["num_failed"] += 1
             result["tests_failed"].append("Copy failed with exception")
@@ -44,7 +46,8 @@ class ETDDAISEndToEnd():
         payload_data = {}
         # Build DRS Admin MD
         if dest_path:
-            payload_data = self.__build_drs_admin_md_for_documentation(dest_path)
+            payload_data = self. \
+                __build_drs_admin_md_for_documentation(dest_path)
         else:
             result["num_failed"] += 1
             result["tests_failed"].append("Copy failed")
@@ -64,20 +67,22 @@ class ETDDAISEndToEnd():
                                "text": str(e)}}
 
         return result
-    
+
     def end_to_end_images_test(self):
         """
-        This function performs an end-to-end test for the ETD system using image files.
-        It copies a test submission file from the data directory to the ETD 'in' directory,
-        builds DRS Admin MD for the images, and calls DIMS. It returns a dictionary with
-        the number of failed tests, a list of failed tests, and additional information
-        about the failed tests if any.
+        This function performs an end-to-end test for the ETD system using
+        image files. It copies a test submission file from the data directory
+        to the ETD 'in' directory, builds DRS Admin MD for the images, and
+        calls DIMS. It returns a dictionary with the number of failed tests,
+        a list of failed tests, and additional information about the failed
+        tests if any.
 
         Returns:
             dict: A dictionary with the following keys:
                 - num_failed (int): The number of failed tests.
                 - tests_failed (list): A list of failed tests.
-                - info (dict): Additional information about the failed tests if any.
+                - info (dict): Additional information about the failed tests
+                if any.
         """
         result = {"num_failed": 0,
                   "tests_failed": [],
@@ -86,7 +91,8 @@ class ETDDAISEndToEnd():
         try:
             # Copy test submission file from data dir to ETD 'in' directory
             zip_file = "submission_five_gifs.zip"
-            dest_path = self.__copy_test_submission(zip_file, "end_to_end_images_test")
+            dest_path = self.__copy_test_submission(
+                zip_file, "end_to_end_images_test")
         except Exception as e:
             result["num_failed"] += 1
             result["tests_failed"].append("Copy failed with exception")
@@ -98,7 +104,8 @@ class ETDDAISEndToEnd():
         payload_data = {}
         # Build DRS Admin MD
         if dest_path:
-            payload_data = self.__build_drs_admin_md_for_images(dest_path)
+            payload_data = self. \
+                __build_drs_admin_md_for_images(dest_path)
         else:
             result["num_failed"] += 1
             result["tests_failed"].append("Copy failed")
@@ -124,7 +131,7 @@ class ETDDAISEndToEnd():
         test_path = os.path.join(test_dir, zip_file)
 
         dest_dir = os.getenv("ETD_IN_DIR")
-        dest_path = os.path.join(dest_dir,test_submission_dir_name)
+        dest_path = os.path.join(dest_dir, test_submission_dir_name)
         os.makedirs(dest_path, exist_ok=True)
         try:
             shutil.copy(test_path, dest_path)
@@ -193,7 +200,7 @@ class ETDDAISEndToEnd():
                         }
                         }
         return payload_data
-    
+
     def __build_drs_admin_md_for_images(self, dest_path):
         # Create a unique OSN based on the timestamp
         timestamp_appender = str(int(datetime.now().timestamp()))
