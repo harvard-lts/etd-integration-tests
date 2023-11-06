@@ -323,7 +323,7 @@ class ETDDAISEndToEnd():
 
         thesis_name = "Alfred_S_MArchI_F21 Thesis.pdf"
         license_name = "setup_2E592954-F85C-11EA-ABB1-E61AE629DA94.pdf"
-        osn_unique_appender = "ETD_THESIS_gsd_2022-05_PQ_28963877_" \
+        osn_unique_appender = "gsd_2022-05_PQ_28963877_" \
             + timestamp_appender
         file_info = {
             thesis_name: {
