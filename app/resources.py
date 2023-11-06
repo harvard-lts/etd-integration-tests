@@ -132,7 +132,7 @@ def define_resources(app):
         result["info"] = result["info"] | end_to_end_result["info"]
 
         return json.dumps(result)
-    
+
     @app.route('/etd_with_audio_test')
     def etd_with_audio_test():
         result = {"num_failed": 0,
