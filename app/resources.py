@@ -139,7 +139,7 @@ def define_resources(app):
                   "tests_failed": [], "info": {}}
 
         dais_end_to_end_image = ETDDAISEndToEnd()
-        end_to_end_result = dais_end_to_end_image.end_to_end_images_test()
+        end_to_end_result = dais_end_to_end_image.end_to_end_audio_test()
         result["num_failed"] = end_to_end_result["num_failed"]
         if len(end_to_end_result["tests_failed"]) > 0:
             result["tests_failed"].append(end_to_end_result["tests_failed"])
