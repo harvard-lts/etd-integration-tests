@@ -47,6 +47,17 @@ class ETDDashServiceChecks():
                 self.logger.info(">>> Cleanup test object")
                 self.cleanup_test_object(base_name)
 
+                # check that the test object is not already in dash
+                pre_count = self.check_submission_count()
+                if pre_count != 0:
+                    result["num_failed"] += 1
+                    result["tests_failed"].append("DASH_OBJECT_EXISTS")
+                    result["info"] = {"Test object is already in dash":
+                                      {"status_code": 500,
+                                       "url": os.getenv("DASH_REST_URL"),
+                                       "count": pre_count}}
+                    self.logger.error("Test object is already in dash")
+
                 # 2. put the test object in the dropbox
                 self.logger.info(">>> SFTP test object")
                 try:
@@ -291,3 +302,20 @@ class ETDDashServiceChecks():
                               {"status_code": 500,
                                "text": f"Mapfile not found: {mapfile_path}"}}  # noqa: E501
             self.logger.error(f"Mapfile not found: {mapfile_path}")
+    
+    # Check the number of times a submission has been submitted to dash
+    def check_submission_count(self):
+        """
+        Checks the number of times a submission has been submitted to dash.
+
+        Args:
+            resp_text (str): The response text from the API call.
+
+        Returns:
+            int: The number of times a submission has been submitted to dash.
+        """
+        resp_text = self.get_dash_object()
+        # log resp_text for debugging
+        self.logger.debug(">>> Dash object: " + resp_text)
+        count = len(json.loads(resp_text))
+        return count
