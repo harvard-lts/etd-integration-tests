@@ -47,6 +47,12 @@ class ETDDashServiceChecks():
                 self.logger.info(">>> Cleanup test object")
                 self.cleanup_test_object(base_name)
 
+                # verify that the test object is not already in dash
+                self.verify_submission_count(0,
+                                             "DASH_OBJECT_EXISTS",
+                                             "Test object is already in dash",
+                                             result)
+
                 # 2. put the test object in the dropbox
                 self.logger.info(">>> SFTP test object")
                 try:
@@ -69,25 +75,17 @@ class ETDDashServiceChecks():
 
                 rest_url = os.getenv("DASH_REST_URL")
                 self.logger.info(">>> Check dash for test object")
-                resp_text = self.get_dash_object()
-                # log resp_text for debugging
-                self.logger.debug(">>> Dash object: " + resp_text)
 
-                # 4. validate mapfile
+                # 4. count should be 1, shows insertion into dash
+                self.verify_submission_count(1,
+                                             "DASH",
+                                             "Dash count is not 1",
+                                             result)
+
+                # 5. validate mapfile
                 self.logger.info(">>> Validate test object mapfile")
-                self.validate_mapfile(resp_text, base_name, result)
+                self.validate_mapfile(base_name, result)
 
-                # 5. count should be 1, shows insertion into dash
-                count = len(json.loads(resp_text))
-                if count != 1:
-                    result["num_failed"] += 1
-                    result["tests_failed"].append("DASH")
-                    result["info"] = {"DASH count failed":
-                                      {"status_code": 500,
-                                       "url": rest_url,
-                                       "count": count,
-                                       "text": resp_text}}
-                    self.logger.error("Count is not 1: " + resp_text)
                 # 6. cleanup the test object from the filesystem
                 self.logger.info(">>> Clean up test object")
                 self.cleanup_test_object(base_name)
@@ -115,20 +113,13 @@ class ETDDashServiceChecks():
                                  args=[message], kwargs={},
                                  queue=incoming_queue)
                 time.sleep(sleep_secs)  # wait for queue
-                self.logger.info(">>> Check dash for duplicate test object")
-                resp_text = self.get_dash_object()
-                count = len(json.loads(resp_text))
 
-                # 8. count shouldn't be 2, no duplicate insertion allowed
-                if count == 2:
-                    result["num_failed"] += 1
-                    result["tests_failed"].append("DASH")
-                    result["info"] = {"DASH count failed":
-                                      {"status_code": 500,
-                                       "url": rest_url,
-                                       "count": count,
-                                       "text": resp_text}}
-                    self.logger.error("Count is 2: " + resp_text)
+                # 8. count should still be 1, no duplicate insertion allowed
+                self.logger.info(">>> Check dash for duplicate test object")
+                self.verify_submission_count(1,
+                                             "DASH_DUPE",
+                                             "Dash count is not 1",
+                                             result)
 
                 # 9. check the dupe directory to make sure
                 # the test object is there
@@ -162,6 +153,7 @@ class ETDDashServiceChecks():
 
                 # 10. delete the test object from dash
                 self.logger.info(">>> Delete duplicate test object from dash")
+                resp_text = self.get_dash_object()
                 if resp_text != "[]":
                     uuid = json.loads(resp_text)[0]["uuid"]
                     url = f"{rest_url}/items/{uuid}"
@@ -180,6 +172,12 @@ class ETDDashServiceChecks():
                                            "session_key": session_key,
                                            "text": "Delete failed"}}
                         self.logger.error("Delete failed: " + response.text)
+
+                # verify that the test object is no longer in dash
+                self.verify_submission_count(0,
+                                             "DASH_OBJECT_NOT_DELETED",
+                                             "Test object not deleted from dash",  # noqa: E501
+                                             result)
 
                 # 11. cleanup the test object from the filesystem
                 self.logger.info(">>> Clean up duplicate test object")
@@ -253,18 +251,18 @@ class ETDDashServiceChecks():
         return ''.join(random.choices(string.digits, k=10))
 
     # Method to validate mapfile for test object.
-    def validate_mapfile(self, resp_text, base_name, result):
+    def validate_mapfile(self, base_name, result):
         """
         Validates the contents of the mapfile generated for a submission.
 
         Args:
-            resp_text (str): The response text from the API call.
             base_name (str): The base name of the submission.
             result (dict): The dictionary containing the test results.
 
         Returns:
             None
         """
+        resp_text = self.get_dash_object()
         handle = json.loads(resp_text)[0]["handle"]
         sub_id = f"submission_{base_name}"
         # read mapfile in out/ directory
@@ -291,3 +289,35 @@ class ETDDashServiceChecks():
                               {"status_code": 500,
                                "text": f"Mapfile not found: {mapfile_path}"}}  # noqa: E501
             self.logger.error(f"Mapfile not found: {mapfile_path}")
+
+    # Check the number of times a submission has been submitted to dash
+    def verify_submission_count(self, expected_count, error_name, error_msg, result):  # noqa: E501
+        """
+        Verifies the number of times a submission has been submitted to dash.
+        If the count does not match expected count, an error is logged and
+        recorded in the result dictionary.
+
+        Args:
+            expected_count (int): The expected count of submissions.
+            error_name (str): The name of the error.
+            error_msg (str): The error message to log.
+            result (dict): The dictionary containing the test results.
+
+        Returns:
+            int: The number of times a submission has been submitted to dash.
+        """
+        rest_url = os.getenv("DASH_REST_URL")
+        resp_text = self.get_dash_object()
+        self.logger.debug(">>> Dash object: " + resp_text)
+
+        count = len(json.loads(resp_text))
+        if count != expected_count:
+            result["num_failed"] += 1
+            result["tests_failed"].append(error_name)
+            result["info"] = {error_msg:
+                              {"status_code": 500,
+                               "url": rest_url,
+                               "count": count,
+                               "text": resp_text}}
+            self.logger.error(error_msg)
+        return count
