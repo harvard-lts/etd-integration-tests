@@ -256,7 +256,6 @@ class ETDDashServiceChecks():
         Validates the contents of the mapfile generated for a submission.
 
         Args:
-            resp_text (str): The response text from the API call.
             base_name (str): The base name of the submission.
             result (dict): The dictionary containing the test results.
 
