@@ -295,7 +295,7 @@ class ETDDashServiceChecks():
     def verify_submission_count(self, expected_count, error_name, error_msg, result):  # noqa: E501
         """
         Verifies the number of times a submission has been submitted to dash.
-        If the count does not match expected count, an error is logged and 
+        If the count does not match expected count, an error is logged and
         recorded in the result dictionary.
 
         Args:
