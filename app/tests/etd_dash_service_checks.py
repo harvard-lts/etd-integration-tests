@@ -251,7 +251,7 @@ class ETDDashServiceChecks():
         return ''.join(random.choices(string.digits, k=10))
 
     # Method to validate mapfile for test object.
-    def validate_mapfile(self, resp_text, base_name, result):
+    def validate_mapfile(self, base_name, result):
         """
         Validates the contents of the mapfile generated for a submission.
 
