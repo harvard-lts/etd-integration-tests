@@ -302,7 +302,7 @@ class ETDDashServiceChecks():
                               {"status_code": 500,
                                "text": f"Mapfile not found: {mapfile_path}"}}  # noqa: E501
             self.logger.error(f"Mapfile not found: {mapfile_path}")
-    
+
     # Check the number of times a submission has been submitted to dash
     def check_submission_count(self):
         """
