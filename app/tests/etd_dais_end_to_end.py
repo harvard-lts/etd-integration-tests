@@ -268,7 +268,6 @@ class ETDDAISEndToEnd():
             thesis_name: {
                 "modified_file_name":
                 "0521Yolandayuanlupeng_finalNaming_Expeditor.pdf",
-                "file_role": "ARCHIVAL_MASTER",
                 "object_role": "THESIS",
                 "object_osn": "ETD_THESIS_test_2023-05_PQ_30522803_"
                 + osn_unique_appender,
@@ -278,8 +277,7 @@ class ETDDAISEndToEnd():
             license_name: {
                 "modified_file_name":
                 "setup_2E592954-F85C-11EA-ABB1-E61AE629DA94.pdf",
-                "file_role": "LICENSE",
-                "object_role": "LICENSE",
+               "object_role": "LICENSE",
                 "object_osn": "ETD_LICENSE_test_2023-05_PQ_30522803_"
                 + osn_unique_appender,
                 "file_osn": "ETD_LICENSE_test_2023-05_PQ_30522803_"
@@ -287,7 +285,6 @@ class ETDDAISEndToEnd():
             },
             "mets.xml": {
                 "modified_file_name": "mets.xml",
-                "file_role": "DOCUMENTATION",
                 "object_role": "DOCUMENTATION",
                 "object_osn": "ETD_DOCUMENTATION_test_2023-05_PQ_30522803_"
                 + osn_unique_appender,
@@ -329,7 +326,6 @@ class ETDDAISEndToEnd():
             thesis_name: {
                 "modified_file_name":
                 "Alfred_S_MArchI_F21_Thesis.pdf",
-                "file_role": "ARCHIVAL_MASTER",
                 "object_role": "THESIS",
                 "object_osn": "ETD_THESIS_" + osn_unique_appender,
                 "file_osn": "ETD_THESIS_" + osn_unique_appender + "_1"
@@ -337,42 +333,36 @@ class ETDDAISEndToEnd():
             license_name: {
                 "modified_file_name":
                 "setup_2E592954-F85C-11EA-ABB1-E61AE629DA94.pdf",
-                "file_role": "LICENSE",
                 "object_role": "LICENSE",
                 "object_osn": "ETD_LICENSE_" + osn_unique_appender,
                 "file_osn": "ETD_LICENSE_" + osn_unique_appender + "_1"
             },
             "mets.xml": {
                 "modified_file_name": "mets.xml",
-                "file_role": "DOCUMENTATION",
                 "object_role": "DOCUMENTATION",
                 "object_osn": "ETD_DOCUMENTATION_" + osn_unique_appender,
                 "file_osn": "ETD_DOCUMENTATION_" + osn_unique_appender + "_1"
             },
             "Plan Gifs.zip": {
                 "modified_file_name": "Plan_Gifs.zip",
-                "file_role": "ARCHIVAL_MASTER",
                 "object_role": "THESIS_SUPPLEMENT",
                 "object_osn": "ETD_SUPPLEMENT_" + osn_unique_appender + "_1",
                 "file_osn": "ETD_SUPPLEMENT_" + osn_unique_appender + "_1_1"
             },
             "Notation Gifs.zip": {
                 "modified_file_name": "Notation_Gifs.zip",
-                "file_role": "ARCHIVAL_MASTER",
                 "object_role": "THESIS_SUPPLEMENT",
                 "object_osn": "ETD_SUPPLEMENT_" + osn_unique_appender + "_2",
                 "file_osn": "ETD_SUPPLEMENT_" + osn_unique_appender + "_2_1"
             },
             "Dance Gifs.zip": {
                 "modified_file_name": "Dance_Gifs.zip",
-                "file_role": "ARCHIVAL_MASTER",
                 "object_role": "THESIS_SUPPLEMENT",
                 "object_osn": "ETD_SUPPLEMENT_" + osn_unique_appender + "_3",
                 "file_osn": "ETD_SUPPLEMENT_" + osn_unique_appender + "_3_1"
             },
             "Alfred_S_Model gif.gif": {
                 "modified_file_name": "Alfred_S_Model_gif.gif",
-                "file_role": "ARCHIVAL_MASTER",
                 "object_role": "THESIS_SUPPLEMENT",
                 "object_osn": "ETD_SUPPLEMENT_" + osn_unique_appender + "_4",
                 "file_osn": "ETD_SUPPLEMENT_" + osn_unique_appender + "_4_1"
@@ -411,7 +401,6 @@ class ETDDAISEndToEnd():
             thesis_name: {
                 "modified_file_name":
                 "20210524_Thesis_Archival_Submission_JB_Signed.pdf",
-                "file_role": "ARCHIVAL_MASTER",
                 "object_role": "THESIS",
                 "object_osn": "ETD_THESIS_" + osn_unique_appender,
                 "file_osn": "ETD_THESIS_" + osn_unique_appender + "_1"
@@ -419,49 +408,42 @@ class ETDDAISEndToEnd():
             license_name: {
                 "modified_file_name":
                 "setup_2E592954-F85C-11EA-ABB1-E61AE629DA94.pdf",
-                "file_role": "LICENSE",
                 "object_role": "LICENSE",
                 "object_osn": "ETD_LICENSE_" + osn_unique_appender,
                 "file_osn": "ETD_LICENSE_" + osn_unique_appender + "_1"
             },
             "mets.xml": {
                 "modified_file_name": "mets.xml",
-                "file_role": "DOCUMENTATION",
                 "object_role": "DOCUMENTATION",
                 "object_osn": "ETD_DOCUMENTATION_" + osn_unique_appender,
                 "file_osn": "ETD_DOCUMENTATION_" + osn_unique_appender + "_1"
             },
             "GIF_01_SlabShift.gif": {
                 "modified_file_name": "GIF_01_SlabShift.gif",
-                "file_role": "ARCHIVAL_MASTER",
                 "object_role": "THESIS_SUPPLEMENT",
                 "object_osn": "ETD_SUPPLEMENT_" + osn_unique_appender + "_1",
                 "file_osn": "ETD_SUPPLEMENT_" + osn_unique_appender + "_1_1"
             },
             "GIF_02_Facade1NE.gif": {
                 "modified_file_name": "GIF_02_Facade1NE.gif",
-                "file_role": "ARCHIVAL_MASTER",
                 "object_role": "THESIS_SUPPLEMENT",
                 "object_osn": "ETD_SUPPLEMENT_" + osn_unique_appender + "_2",
                 "file_osn": "ETD_SUPPLEMENT_" + osn_unique_appender + "_2_1"
             },
             "GIF_03_Facade2SW.gif": {
                 "modified_file_name": "GIF_03_Facade2SW.gif",
-                "file_role": "ARCHIVAL_MASTER",
                 "object_role": "THESIS_SUPPLEMENT",
                 "object_osn": "ETD_SUPPLEMENT_" + osn_unique_appender + "_3",
                 "file_osn": "ETD_SUPPLEMENT_" + osn_unique_appender + "_3_1"
             },
             "GIF_04_Room_1.Gar.gif": {
                 "modified_file_name": "GIF_04_Room_1.Gar.gif",
-                "file_role": "ARCHIVAL_MASTER",
                 "object_role": "THESIS_SUPPLEMENT",
                 "object_osn": "ETD_SUPPLEMENT_" + osn_unique_appender + "_4",
                 "file_osn": "ETD_SUPPLEMENT_" + osn_unique_appender + "_4_1"
             },
             "GIF_05_Room_2.TwoLiv.gif": {
                 "modified_file_name": "GIF_05_Room_2.TwoLiv.gif",
-                "file_role": "ARCHIVAL_MASTER",
                 "object_role": "THESIS_SUPPLEMENT",
                 "object_osn": "ETD_SUPPLEMENT_" + osn_unique_appender + "_5",
                 "file_osn": "ETD_SUPPLEMENT_" + osn_unique_appender + "_5_1"
@@ -501,7 +483,6 @@ class ETDDAISEndToEnd():
             thesis_name: {
                 "modified_file_name":
                 "MLA_Thesis_Auger_Catherine_May2023.pdf",
-                "file_role": "ARCHIVAL_MASTER",
                 "object_role": "THESIS",
                 "object_osn": "ETD_THESIS_" + osn_unique_appender,
                 "file_osn": "ETD_THESIS_" + osn_unique_appender + "_1"
@@ -509,63 +490,54 @@ class ETDDAISEndToEnd():
             license_name: {
                 "modified_file_name":
                 "setup_2E592954-F85C-11EA-ABB1-E61AE629DA94.pdf",
-                "file_role": "LICENSE",
                 "object_role": "LICENSE",
                 "object_osn": "ETD_LICENSE_" + osn_unique_appender,
                 "file_osn": "ETD_LICENSE_" + osn_unique_appender + "_1"
             },
             "mets.xml": {
                 "modified_file_name": "mets.xml",
-                "file_role": "DOCUMENTATION",
                 "object_role": "DOCUMENTATION",
                 "object_osn": "ETD_DOCUMENTATION_" + osn_unique_appender,
                 "file_osn": "ETD_DOCUMENTATION_" + osn_unique_appender + "_1"
             },
             "Gamelan_Islam.mp3": {
                 "modified_file_name": "Gamelan_Islam.mp3",
-                "file_role": "ARCHIVAL_MASTER",
                 "object_role": "THESIS_SUPPLEMENT",
                 "object_osn": "ETD_SUPPLEMENT_" + osn_unique_appender + "_1",
                 "file_osn": "ETD_SUPPLEMENT_" + osn_unique_appender + "_1_1"
             },
             "Harry Styles.mp3": {
                 "modified_file_name": "Harry_Styles.mp3",
-                "file_role": "ARCHIVAL_MASTER",
                 "object_role": "THESIS_SUPPLEMENT",
                 "object_osn": "ETD_SUPPLEMENT_" + osn_unique_appender + "_2",
                 "file_osn": "ETD_SUPPLEMENT_" + osn_unique_appender + "_2_1"
             },
             "Jalan Raya Ubud.mp3": {
                 "modified_file_name": "Jalan_Raya_Ubud.mp3",
-                "file_role": "ARCHIVAL_MASTER",
                 "object_role": "THESIS_SUPPLEMENT",
                 "object_osn": "ETD_SUPPLEMENT_" + osn_unique_appender + "_3",
                 "file_osn": "ETD_SUPPLEMENT_" + osn_unique_appender + "_3_1"
             },
             "Kuningan.mp3": {
                 "modified_file_name": "Kuningan.mp3",
-                "file_role": "ARCHIVAL_MASTER",
                 "object_role": "THESIS_SUPPLEMENT",
                 "object_osn": "ETD_SUPPLEMENT_" + osn_unique_appender + "_4",
                 "file_osn": "ETD_SUPPLEMENT_" + osn_unique_appender + "_4_1"
             },
             "Monkey Forest.mp3": {
                 "modified_file_name": "Monkey_Forest.mp3",
-                "file_role": "ARCHIVAL_MASTER",
                 "object_role": "THESIS_SUPPLEMENT",
                 "object_osn": "ETD_SUPPLEMENT_" + osn_unique_appender + "_5",
                 "file_osn": "ETD_SUPPLEMENT_" + osn_unique_appender + "_5_1"
             },
             "Pasar Goris.mp3": {
                 "modified_file_name": "Pasar_Goris.mp3",
-                "file_role": "ARCHIVAL_MASTER",
                 "object_role": "THESIS_SUPPLEMENT",
                 "object_osn": "ETD_SUPPLEMENT_" + osn_unique_appender + "_6",
                 "file_osn": "ETD_SUPPLEMENT_" + osn_unique_appender + "_6_1"
             },
             "The Pipe.mp3": {
                 "modified_file_name": "The_Pipe.mp3",
-                "file_role": "ARCHIVAL_MASTER",
                 "object_role": "THESIS_SUPPLEMENT",
                 "object_osn": "ETD_SUPPLEMENT_" + osn_unique_appender + "_7",
                 "file_osn": "ETD_SUPPLEMENT_" + osn_unique_appender + "_7_1"
