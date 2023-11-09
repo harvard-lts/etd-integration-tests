@@ -277,7 +277,7 @@ class ETDDAISEndToEnd():
             license_name: {
                 "modified_file_name":
                 "setup_2E592954-F85C-11EA-ABB1-E61AE629DA94.pdf",
-               "object_role": "LICENSE",
+                "object_role": "LICENSE",
                 "object_osn": "ETD_LICENSE_test_2023-05_PQ_30522803_"
                 + osn_unique_appender,
                 "file_osn": "ETD_LICENSE_test_2023-05_PQ_30522803_"
