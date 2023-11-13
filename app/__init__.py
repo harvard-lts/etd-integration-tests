@@ -31,7 +31,7 @@ def create_app():
 
 def configure_logger():
     log_level = os.getenv("APP_LOG_LEVEL", "INFO")
-    log_dir = os.getenv("LOG_DIR", "/home/etdadm/logs")
+    log_dir = os.getenv("LOG_DIR", "/home/etdadm/logs/etd_itest")
     log_file_path = os.path.join(log_dir, "int_tests.log")
     formatter = logging.Formatter(
         '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
