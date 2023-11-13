@@ -75,7 +75,7 @@ class ETDAlmaMonitorServiceChecks():
                   "tests_failed": [], "info": {}}
         # Set up mongo
         mongo_url = os.getenv('MONGO_URL')
-        known_pq_id = os.getenv("KNOWN_PQ_ID")
+        known_pq_id = os.getenv("SUBMISSION_PQ_ID")
         record = {"proquest_id": known_pq_id,
                   "school_alma_dropbox": "gsd",
                   "alma_submission_status": "ALMA_DROPBOX",
