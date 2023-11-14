@@ -1,6 +1,6 @@
 APP_VERSION=0.0.1
 APP_LOG_LEVEL=DEBUG
-LOG_DIR=/home/etdadm/logs
+LOG_DIR=/home/etdadm/logs/etd_itest
 
 # MongoDB info
 MONGO_URL=mongodb://USERNAME:PASSWORD@mongo-dev-1.lts.harvard.edu:27072,mongo-dev-2.lts.harvard.edu:27072,mongo-dev-arbiter.lts.harvard.edu:27072/?replicaSet=devrs&authSource=etdadm-dev
@@ -48,3 +48,5 @@ ALMA_DROPBOX_USER=
 ALMA_SERVICE_QUEUE_NAME=etd_in_storage
 ALMA_BATCH_NAME=
 ALMA_MESSAGE_FILE=alma_message.json
+
+ALMA_MONITOR_SERVICE_QUEUE_NAME=in_alma_dropbox

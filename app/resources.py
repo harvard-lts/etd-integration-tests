@@ -6,6 +6,8 @@ from app.tests.connectivity_checks import ConnectivityChecks
 from app.tests.etd_dash_service_checks import ETDDashServiceChecks
 from app.tests.etd_dais_end_to_end import ETDDAISEndToEnd
 from app.tests.etd_alma_service_checks import ETDAlmaServiceChecks
+from app.tests.etd_alma_monitor_service_checks \
+    import ETDAlmaMonitorServiceChecks
 
 
 def define_resources(app):
@@ -155,6 +157,21 @@ def define_resources(app):
 
         etdAlmaServiceChecks = ETDAlmaServiceChecks()
         export_result = etdAlmaServiceChecks.alma_service_test()
+        result["num_failed"] = export_result["num_failed"]
+        if len(export_result["tests_failed"]) > 0:
+            result["tests_failed"].append(export_result["tests_failed"])
+        result["info"] = result["info"] | export_result["info"]
+
+        return json.dumps(result)
+
+    @app.route('/alma_monitor_service')
+    def etd_alma_monitor_service_testing():
+        result = {"num_failed": 0,
+                  "tests_failed": [], "info": {}}
+
+        etdAlmaMonitorServiceChecks = ETDAlmaMonitorServiceChecks()
+        export_result = etdAlmaMonitorServiceChecks. \
+            monitor_alma_and_invoke_dims()
         result["num_failed"] = export_result["num_failed"]
         if len(export_result["tests_failed"]) > 0:
             result["tests_failed"].append(export_result["tests_failed"])
