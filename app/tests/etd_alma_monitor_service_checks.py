@@ -41,6 +41,25 @@ class ETDAlmaMonitorServiceChecks():
                                    "text": str(e)}})
         return result
 
+    def monitor_alma_and_invoke_dim_missing_submission(self):
+        result = {"num_failed": 0,
+                  "tests_failed": [],
+                  "info": {}}
+        try:
+            # Copy test submission file from data dir to ETD 'in' directory
+            dir_unique_appender = str(int(datetime.now().timestamp()))
+            directory_id = "missing_submission_alma_monitor_service_test_" + dir_unique_appender
+            result = self.__insert_alma_reccord_in_mongo(directory_id)
+            self.__place_queue_message()
+        except Exception as e:
+            self.logger.error(traceback.format_exc())
+            result["num_failed"] += 1
+            result["tests_failed"].append("Copy failed with exception")
+            result["info"].update({"Copy failed with exception":
+                                  {"status_code": 500,
+                                   "text": str(e)}})
+        return result
+
     def __copy_test_submission(self, zip_file, test_submission_dir_name):
         result = {"num_failed": 0,
                   "tests_failed": [],

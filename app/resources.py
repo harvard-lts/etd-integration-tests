@@ -178,3 +178,18 @@ def define_resources(app):
         result["info"] = result["info"] | export_result["info"]
 
         return json.dumps(result)
+
+    @app.route('/alma_monitor_service_missing_submission')
+    def etd_alma_monitor_service_missing_submission_testing():
+        result = {"num_failed": 0,
+                  "tests_failed": [], "info": {}}
+
+        etdAlmaMonitorServiceChecks = ETDAlmaMonitorServiceChecks()
+        export_result = etdAlmaMonitorServiceChecks. \
+            monitor_alma_and_invoke_dim_missing_submission()
+        result["num_failed"] = export_result["num_failed"]
+        if len(export_result["tests_failed"]) > 0:
+            result["tests_failed"].append(export_result["tests_failed"])
+        result["info"] = result["info"] | export_result["info"]
+
+        return json.dumps(result)
