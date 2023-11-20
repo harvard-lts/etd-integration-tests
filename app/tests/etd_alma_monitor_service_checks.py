@@ -48,7 +48,8 @@ class ETDAlmaMonitorServiceChecks():
         try:
             # Copy test submission file from data dir to ETD 'in' directory
             dir_unique_appender = str(int(datetime.now().timestamp()))
-            directory_id = "missing_submission_alma_monitor_service_test_" + dir_unique_appender
+            directory_id = "missing_submission_alma_monitor_service_test_" \
+                + dir_unique_appender
             result = self.__insert_alma_reccord_in_mongo(directory_id)
             self.__place_queue_message()
         except Exception as e:
