@@ -136,7 +136,7 @@ class ETDAlmaMonitorServiceChecks():
             mongo_client = MongoClient(mongo_url, maxPoolSize=1)
             mongo_db = mongo_client[os.getenv("MONGO_DBNAME")]
             collection = mongo_db[os.getenv("MONGO_COLLECTION")]
-            retvalues = collection.find(query, fields)
+            retvalues = list(collection.find(query, fields))
             if len(retvalues) != 1:
                 result["num_failed"] += 1
                 result["tests_failed"].append("Expected Mongo results wrong")
