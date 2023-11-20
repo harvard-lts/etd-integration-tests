@@ -1,4 +1,5 @@
 import os
+import time
 from celery import Celery
 import shutil
 import logging
@@ -35,8 +36,8 @@ class ETDAlmaMonitorServiceChecks():
         except Exception as e:
             self.logger.error(traceback.format_exc())
             result["num_failed"] += 1
-            result["tests_failed"].append("Copy failed with exception")
-            result["info"].update({"Copy failed with exception":
+            result["tests_failed"].append("Monitor failed with exception")
+            result["info"].update({"Monitor failed with exception":
                                   {"status_code": 500,
                                    "text": str(e)}})
         return result
@@ -52,11 +53,14 @@ class ETDAlmaMonitorServiceChecks():
                 + dir_unique_appender
             result = self.__insert_alma_reccord_in_mongo(directory_id)
             self.__place_queue_message()
+            sleep_secs = int(os.environ.get('SLEEP_SECS', 30))
+            time.sleep(sleep_secs)  # wait for queue
+            result = self.__check_alma_status_failed(directory_id)
         except Exception as e:
             self.logger.error(traceback.format_exc())
             result["num_failed"] += 1
-            result["tests_failed"].append("Copy failed with exception")
-            result["info"].update({"Copy failed with exception":
+            result["tests_failed"].append("Monitor failed with exception")
+            result["info"].update({"Monitor failed with exception":
                                   {"status_code": 500,
                                    "text": str(e)}})
         return result
@@ -109,6 +113,44 @@ class ETDAlmaMonitorServiceChecks():
             mongo_db = mongo_client[os.getenv("MONGO_DBNAME")]
             collection = mongo_db[os.getenv("MONGO_COLLECTION")]
             collection.insert_one(record)
+            mongo_client.close()
+        except Exception as err:
+            self.logger.error(traceback.format_exc())
+            result = {"num_failed": 1,
+                      "tests_failed": ["Mongo"],
+                      "info": {"Failed Mongo":
+                               {"status_code": 500,
+                                "text": str(err)}}}
+            mongo_client.close()
+        return result
+
+    def __check_alma_status_failed(self, directory_id):
+        result = {"num_failed": 0,
+                  "tests_failed": [], "info": {}}
+        # Set up mongo
+        mongo_url = os.getenv('MONGO_URL')
+        query = {"directory_id":
+                 directory_id}
+        fields = {"alma_submission_status": 1}
+        try:
+            mongo_client = MongoClient(mongo_url, maxPoolSize=1)
+            mongo_db = mongo_client[os.getenv("MONGO_DBNAME")]
+            collection = mongo_db[os.getenv("MONGO_COLLECTION")]
+            retvalues = collection.find(query, fields)
+            if len(retvalues) != 1:
+                result["num_failed"] += 1
+                result["tests_failed"].append("Expected Mongo results wrong")
+                result["info"] = {"Mongo query failed":
+                                  {"status_code": 500,
+                                   "text": "Query returned {} records".
+                                   format(len(retvalues))}}
+            elif retvalues[0]["alma_submission_status"] != "FAILED":
+                result["num_failed"] += 1
+                result["tests_failed"].append("Expected Status incorrect")
+                result["info"] = {"Mongo query failed":
+                                  {"status_code": 500,
+                                   "text": "Status returned {} for {}".
+                                   format(retvalues[0]["alma_submission_status"], directory_id)}} # noqa
             mongo_client.close()
         except Exception as err:
             self.logger.error(traceback.format_exc())
