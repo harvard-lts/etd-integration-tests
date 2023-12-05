@@ -113,7 +113,6 @@ class ETDEndToEnd():
         #                                      "DASH_OBJECT_NOT_DELETED",
         #                                      "Test object not deleted from dash",  # noqa: E501
         #                                      result)
-
         return result
 
     def get_dash_object(self, identifier):
