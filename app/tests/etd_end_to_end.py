@@ -24,16 +24,13 @@ class ETDEndToEnd():
         incoming_queue = os.environ.get('FIRST_QUEUE_NAME',
                                         'etd_submission_ready')
 
-        FEATURE_FLAGS = "feature_flags"
-        DASH_FEATURE_FLAG = "dash_feature_flag"
-
         client = Celery('app')
         client.config_from_object('celeryconfig')
 
         base_name = self.random_digit_string()
         # clear out any old test object
         self.logger.info(">>> Cleanup test object")
-        self.cleanup_test_object(base_name)
+        #self.cleanup_test_object(base_name)
 
         # put the test object in the dropbox
         self.logger.info(">>> SFTP test object")
