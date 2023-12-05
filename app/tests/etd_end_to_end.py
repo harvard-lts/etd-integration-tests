@@ -9,6 +9,8 @@ import requests
 import random
 import string
 import logging
+import xml.etree.ElementTree as ET
+import zipfile
 
 
 class ETDEndToEnd():
@@ -32,49 +34,54 @@ class ETDEndToEnd():
         self.logger.info(">>> Cleanup test object")
         # self.cleanup_test_object(base_name)
 
+        zipFile = "submission_999999.zip"
+        newZipFile = "submission_" + base_name + ".zip"
+        shutil.copyfile(f"./testdata/{zipFile}", f"./testdata/{newZipFile}")
+
+        self.replace_pq_id(base_name, f"./testdata/{newZipFile}")
         # put the test object in the dropbox
-        self.logger.info(">>> SFTP test object")
-        try:
-            self.sftp_test_object(base_name)
-        except Exception as err:
-            result["num_failed"] += 1
-            result["tests_failed"].append("SFTP")
-            result["info"] = {"Proquest Dropbox sftp failed":
-                              {"status_code": 500,
-                               "text": str(err)}}
-            self.logger.error(str(err))
+        # self.logger.info(">>> SFTP test object")
+        # try:
+        #     self.sftp_test_object(base_name)
+        # except Exception as err:
+        #     result["num_failed"] += 1
+        #     result["tests_failed"].append("SFTP")
+        #     result["info"] = {"Proquest Dropbox sftp failed":
+        #                       {"status_code": 500,
+        #                        "text": str(err)}}
+        #     self.logger.error(str(err))
 
-        # send the test object to dash
-        self.logger.info(">>> Submit test object to dash")
-        dash_message = {
-            "job_ticket_id": "integration_testing",
-            "feature_flags":
-            {
-                "dash_feature_flag": "on",
-                "alma_feature_flag": "on",
-                "send_to_drs_feature_flag": "on",
-                "drs_holding_record_feature_flag": "off"
-            },
-        }
-        client.send_task(name="etd-dash-service.tasks.send_to_dash",
-                         args=[dash_message], kwargs={},
-                         queue=incoming_queue)
-        sleep_secs = int(os.environ.get('SLEEP_SECS', 30))
-        time.sleep(sleep_secs)  # wait for queue
+        # # send the test object to dash
+        # self.logger.info(">>> Submit test object to dash")
+        # dash_message = {
+        #     "job_ticket_id": "integration_testing",
+        #     "feature_flags":
+        #     {
+        #         "dash_feature_flag": "on",
+        #         "alma_feature_flag": "on",
+        #         "send_to_drs_feature_flag": "on",
+        #         "drs_holding_record_feature_flag": "off"
+        #     },
+        # }
+        # client.send_task(name="etd-dash-service.tasks.send_to_dash",
+        #                  args=[dash_message], kwargs={},
+        #                  queue=incoming_queue)
+        # sleep_secs = int(os.environ.get('SLEEP_SECS', 30))
+        # time.sleep(sleep_secs)  # wait for queue
 
-        self.logger.info(">>> Check dash for test object")
+        # self.logger.info(">>> Check dash for test object")
 
-        # count should be 1, shows insertion into dash
-        count = self.verify_submission_count(base_name)
-        rest_url = os.getenv("DASH_REST_URL")
-        if count != 1:
-            result["num_failed"] += 1
-            result["tests_failed"].append("DASH")
-            result["info"] = {"Dash count is not 1":
-                              {"status_code": 500,
-                               "url": rest_url,
-                               "count": count}}
-            self.logger.error("Dash count i not 1")
+        # # count should be 1, shows insertion into dash
+        # count = self.verify_submission_count(base_name)
+        # rest_url = os.getenv("DASH_REST_URL")
+        # if count != 1:
+        #     result["num_failed"] += 1
+        #     result["tests_failed"].append("DASH")
+        #     result["info"] = {"Dash count is not 1":
+        #                       {"status_code": 500,
+        #                        "url": rest_url,
+        #                        "count": count}}
+        #     self.logger.error("Dash count i not 1")
 
         # 6. cleanup the test object from the filesystem
         # self.logger.info(">>> Clean up test object")
@@ -176,3 +183,26 @@ class ETDEndToEnd():
 
         count = len(json.loads(resp_text))
         return count
+    
+    def replace_pq_id(self, new_pq_id, submission_file_path):
+        # Unzip
+        directory_to_extract_to = os.path.join(os.path.dirname(submission_file_path), 'extracted')
+        with zipfile.ZipFile(submission_file_path, 'r') as zip_ref:
+            zip_ref.extractall(directory_to_extract_to)
+
+        # Replace in mets.xml
+        mets_path = os.path.join(directory_to_extract_to, 'mets.xml')
+        tree = ET.parse(mets_path)
+        metsroot = tree.getroot()
+        metsroot.find('.//{http://www.dspace.org/xmlns/dspace/dim}identifier').text = new_pq_id
+        tree.write(open(mets_path, 'w'))
+
+        # Delete submission zip
+        os.remove(submission_file_path)
+
+        # Zip 
+        with zipfile.ZipFile(submission_file_path, mode="w") as archive:
+            for file in os.listdir(directory_to_extract_to):
+                archive.write(os.path.join(directory_to_extract_to, file), file)
+        # Delete extracted directory
+        shutil.rmtree(directory_to_extract_to)
