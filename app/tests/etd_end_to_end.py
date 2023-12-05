@@ -196,7 +196,7 @@ class ETDEndToEnd():
 
         namespaces = {'dim': 'http://www.dspace.org/xmlns/dspace/dim'}
         metsroot.find(".//dim:field[@mdschema='dc'][@element='identifier'][@qualifier='other']", namespaces).text = new_pq_id
-        tree.write(open(mets_path, 'w'))
+        tree.write(mets_path)
 
         # Delete submission zip
         os.remove(submission_file_path)
