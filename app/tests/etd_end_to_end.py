@@ -40,48 +40,48 @@ class ETDEndToEnd():
 
         self.replace_pq_id(base_name, f"./testdata/{newZipFile}")
         # put the test object in the dropbox
-        # self.logger.info(">>> SFTP test object")
-        # try:
-        #     self.sftp_test_object(base_name)
-        # except Exception as err:
-        #     result["num_failed"] += 1
-        #     result["tests_failed"].append("SFTP")
-        #     result["info"] = {"Proquest Dropbox sftp failed":
-        #                       {"status_code": 500,
-        #                        "text": str(err)}}
-        #     self.logger.error(str(err))
+        self.logger.info(">>> SFTP test object")
+        try:
+            self.sftp_test_object(newZipFile)
+        except Exception as err:
+            result["num_failed"] += 1
+            result["tests_failed"].append("SFTP")
+            result["info"] = {"Proquest Dropbox sftp failed":
+                              {"status_code": 500,
+                               "text": str(err)}}
+            self.logger.error(str(err))
 
         # # send the test object to dash
-        # self.logger.info(">>> Submit test object to dash")
-        # dash_message = {
-        #     "job_ticket_id": "integration_testing",
-        #     "feature_flags":
-        #     {
-        #         "dash_feature_flag": "on",
-        #         "alma_feature_flag": "on",
-        #         "send_to_drs_feature_flag": "on",
-        #         "drs_holding_record_feature_flag": "off"
-        #     },
-        # }
-        # client.send_task(name="etd-dash-service.tasks.send_to_dash",
-        #                  args=[dash_message], kwargs={},
-        #                  queue=incoming_queue)
-        # sleep_secs = int(os.environ.get('SLEEP_SECS', 30))
-        # time.sleep(sleep_secs)  # wait for queue
+        self.logger.info(">>> Submit test object to dash")
+        dash_message = {
+            "job_ticket_id": "integration_testing",
+            "feature_flags":
+            {
+                "dash_feature_flag": "on",
+                "alma_feature_flag": "on",
+                "send_to_drs_feature_flag": "on",
+                "drs_holding_record_feature_flag": "off"
+            },
+        }
+        client.send_task(name="etd-dash-service.tasks.send_to_dash",
+                         args=[dash_message], kwargs={},
+                         queue=incoming_queue)
+        sleep_secs = int(os.environ.get('SLEEP_SECS', 30))
+        time.sleep(sleep_secs)  # wait for queue
 
-        # self.logger.info(">>> Check dash for test object")
+        self.logger.info(">>> Check dash for test object")
 
-        # # count should be 1, shows insertion into dash
-        # count = self.verify_submission_count(base_name)
-        # rest_url = os.getenv("DASH_REST_URL")
-        # if count != 1:
-        #     result["num_failed"] += 1
-        #     result["tests_failed"].append("DASH")
-        #     result["info"] = {"Dash count is not 1":
-        #                       {"status_code": 500,
-        #                        "url": rest_url,
-        #                        "count": count}}
-        #     self.logger.error("Dash count i not 1")
+        # count should be 1, shows insertion into dash
+        count = self.verify_submission_count(base_name)
+        rest_url = os.getenv("DASH_REST_URL")
+        if count != 1:
+            result["num_failed"] += 1
+            result["tests_failed"].append("DASH")
+            result["info"] = {"Dash count is not 1":
+                              {"status_code": 500,
+                               "url": rest_url,
+                               "count": count}}
+            self.logger.error("Dash count i not 1")
 
         # 6. cleanup the test object from the filesystem
         # self.logger.info(">>> Clean up test object")
@@ -140,26 +140,24 @@ class ETDEndToEnd():
             for filename in glob.glob('/home/etdadm/data/in/proquest*-' + base_name + '-gsd'):  # noqa: E501
                 shutil.rmtree(filename)
 
-    def sftp_test_object(self, base_name):
+    def sftp_test_object(self, submission_zip_object):
         # proquest2dash test vars
         private_key = os.getenv("PRIVATE_KEY_PATH")
         remoteSite = os.getenv("dropboxServer")
         remoteUser = os.getenv("dropboxUser")
         archiveDir = "archives/gsd"
         incomingDir = "incoming/gsd"
-        zipFile = "submission_999999.zip"
-        newZipFile = "submission_" + base_name + ".zip"
-        self.logger.debug(">>> Test object name: {}".format(newZipFile))
+        self.logger.debug(">>> Test object name: {}".format(submission_zip_object))
         with pysftp.Connection(host=remoteSite,
                                username=remoteUser,
                                private_key=private_key) as sftp:
             # remove any existing test object
-            if sftp.exists(f"{archiveDir}/{zipFile}"):
-                sftp.remove(f"{archiveDir}/{zipFile}")
+            if sftp.exists(f"{archiveDir}/{submission_zip_object}"):
+                sftp.remove(f"{archiveDir}/{submission_zip_object}")
             # sftp test object to incoming dir
             try:
-                sftp.put(f"./testdata/{zipFile}",
-                         f"{incomingDir}/{newZipFile}")
+                sftp.put(f"./testdata/{submission_zip_object}",
+                         f"{incomingDir}/{submission_zip_object}")
             except Exception as err:
                 self.logger.error(f"SFTP error: {err}")
 
