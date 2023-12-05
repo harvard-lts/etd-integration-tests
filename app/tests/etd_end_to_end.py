@@ -30,7 +30,7 @@ class ETDEndToEnd():
         base_name = self.random_digit_string()
         # clear out any old test object
         self.logger.info(">>> Cleanup test object")
-        #self.cleanup_test_object(base_name)
+        # self.cleanup_test_object(base_name)
 
         # put the test object in the dropbox
         self.logger.info(">>> SFTP test object")
@@ -48,7 +48,7 @@ class ETDEndToEnd():
         self.logger.info(">>> Submit test object to dash")
         dash_message = {
             "job_ticket_id": "integration_testing", "integration_test": True,
-            "feature_flags": 
+            "feature_flags":
             {
                 "dash_feature_flag": "on",
                 "alma_feature_flag": "on",
@@ -143,6 +143,7 @@ class ETDEndToEnd():
         incomingDir = "incoming/gsd"
         zipFile = "submission_999999.zip"
         newZipFile = "submission_" + base_name + ".zip"
+        self.logger.debug(">>> Test object name: {}".format(newZipFile))
         with pysftp.Connection(host=remoteSite,
                                username=remoteUser,
                                private_key=private_key) as sftp:
@@ -174,5 +175,4 @@ class ETDEndToEnd():
         self.logger.debug(">>> Dash object: " + resp_text)
 
         count = len(json.loads(resp_text))
-        
         return count
