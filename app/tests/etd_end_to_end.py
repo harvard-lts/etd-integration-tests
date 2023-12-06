@@ -54,7 +54,7 @@ class ETDEndToEnd():
         # # send the test object to dash
         self.logger.info(">>> Submit test object to dash")
         dash_message = {
-            "job_ticket_id": "integration_testing_{base_name}",
+            "job_ticket_id": f"integration_testing_{base_name}",
             "feature_flags":
             {
                 "dash_feature_flag": "on",
