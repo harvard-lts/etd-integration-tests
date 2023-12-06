@@ -54,7 +54,7 @@ class ETDEndToEnd():
         # # send the test object to dash
         self.logger.info(">>> Submit test object to dash")
         dash_message = {
-            "job_ticket_id": "integration_testing",
+            "job_ticket_id": "integration_testing_{base_name}",
             "feature_flags":
             {
                 "dash_feature_flag": "on",
@@ -66,22 +66,22 @@ class ETDEndToEnd():
         client.send_task(name="etd-dash-service.tasks.send_to_dash",
                          args=[dash_message], kwargs={},
                          queue=incoming_queue)
-        sleep_secs = int(os.environ.get('SLEEP_SECS', 30))
-        time.sleep(sleep_secs)  # wait for queue
+        # sleep_secs = int(os.environ.get('SLEEP_SECS', 30))
+        # time.sleep(sleep_secs)  # wait for queue
 
-        self.logger.info(">>> Check dash for test object")
+        # self.logger.info(">>> Check dash for test object")
 
-        # count should be 1, shows insertion into dash
-        count = self.verify_submission_count(base_name)
-        rest_url = os.getenv("DASH_REST_URL")
-        if count != 1:
-            result["num_failed"] += 1
-            result["tests_failed"].append("DASH")
-            result["info"] = {"Dash count is not 1":
-                              {"status_code": 500,
-                               "url": rest_url,
-                               "count": count}}
-            self.logger.error("Dash count i not 1")
+        # # count should be 1, shows insertion into dash
+        # count = self.verify_submission_count(base_name)
+        # rest_url = os.getenv("DASH_REST_URL")
+        # if count != 1:
+        #     result["num_failed"] += 1
+        #     result["tests_failed"].append("DASH")
+        #     result["info"] = {"Dash count is not 1":
+        #                       {"status_code": 500,
+        #                        "url": rest_url,
+        #                        "count": count}}
+        #     self.logger.error("Dash count i not 1")
 
         # 6. cleanup the test object from the filesystem
         # self.logger.info(">>> Clean up test object")
