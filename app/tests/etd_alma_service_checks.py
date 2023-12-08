@@ -26,8 +26,9 @@ class ETDAlmaServiceChecks():
         DASH_FEATURE_FLAG = "dash_feature_flag"
         ALMA_FEATURE_FLAG = "alma_feature_flag"
 
-        yyyymmdd = get_date_time_stamp('day')
-        xmlCollectionFile = f'AlmaDeliveryTest_{yyyymmdd}.xml'
+        yyyymmddhhmmss = get_date_time_stamp('second')
+        instance = os.getenv('INSTANCE')
+        xmlCollectionFile = f'AlmaDeliveryTest_{instance}_{yyyymmddhhmmss}.xml'
 
         client = Celery('app')
         client.config_from_object('celeryconfig')

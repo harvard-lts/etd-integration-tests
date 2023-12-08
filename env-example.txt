@@ -50,3 +50,5 @@ ALMA_BATCH_NAME=
 ALMA_MESSAGE_FILE=alma_message.json
 
 ALMA_MONITOR_SERVICE_QUEUE_NAME=in_alma_dropbox
+
+INSTANCE=dev
