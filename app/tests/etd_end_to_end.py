@@ -65,53 +65,6 @@ class ETDEndToEnd():
         client.send_task(name="etd-dash-service.tasks.send_to_dash",
                          args=[dash_message], kwargs={},
                          queue=incoming_queue)
-        # sleep_secs = int(os.environ.get('SLEEP_SECS', 30))
-        # time.sleep(sleep_secs)  # wait for queue
-
-        # self.logger.info(">>> Check dash for test object")
-
-        # # count should be 1, shows insertion into dash
-        # count = self.verify_submission_count(base_name)
-        # rest_url = os.getenv("DASH_REST_URL")
-        # if count != 1:
-        #     result["num_failed"] += 1
-        #     result["tests_failed"].append("DASH")
-        #     result["info"] = {"Dash count is not 1":
-        #                       {"status_code": 500,
-        #                        "url": rest_url,
-        #                        "count": count}}
-        #     self.logger.error("Dash count i not 1")
-
-        # 6. cleanup the test object from the filesystem
-        # self.logger.info(">>> Clean up test object")
-        # self.cleanup_test_object(base_name)
-
-        # 10. delete the test object from dash
-        # resp_text = self.get_dash_object()
-        # if resp_text != "[]":
-        #     uuid = json.loads(resp_text)[0]["uuid"]
-        #     url = f"{rest_url}/items/{uuid}"
-        #     session_key = self.get_session_key()
-        #     headers = {'Cookie': f'JSESSIONID={session_key}'}
-        #     response = requests.delete(url, headers=headers,
-        #                                verify=False)
-
-        #     if response.status_code != 200:
-        #         result["num_failed"] += 1
-        #         result["tests_failed"].append("DASH")
-        #         result["info"] = {"DASH delete failed":
-        #                           {"status_code": response.status_code,
-        #                            "url": url,
-        #                            "uuid": uuid,
-        #                            "session_key": session_key,
-        #                            "text": "Delete failed"}}
-        #         self.logger.error("Delete failed: " + response.text)
-
-        #         # verify that the test object is no longer in dash
-        #         self.verify_submission_count(0,
-        #                                      "DASH_OBJECT_NOT_DELETED",
-        #                                      "Test object not deleted from dash",  # noqa: E501
-        #                                      result)
         return result
 
     def get_dash_object(self, identifier):
