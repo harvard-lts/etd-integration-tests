@@ -1,4 +1,3 @@
-import time
 import os
 import json
 from celery import Celery
@@ -184,7 +183,8 @@ class ETDEndToEnd():
 
     def replace_pq_id(self, new_pq_id, submission_file_path):
         # Unzip
-        directory_to_extract_to = os.path.join(os.path.dirname(submission_file_path), 'extracted')
+        directory_to_extract_to = os.path.join(os.path.dirname(
+            submission_file_path), 'extracted')
         with zipfile.ZipFile(submission_file_path, 'r') as zip_ref:
             zip_ref.extractall(directory_to_extract_to)
 
@@ -203,7 +203,7 @@ class ETDEndToEnd():
         # Zip
         with zipfile.ZipFile(submission_file_path, mode="w") as archive:
             for file in os.listdir(directory_to_extract_to):
-                archive.write(os.path.join(directory_to_extract_to, 
+                archive.write(os.path.join(directory_to_extract_to,
                                            file), file)
         # Delete extracted directory
         shutil.rmtree(directory_to_extract_to)
