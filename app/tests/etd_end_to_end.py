@@ -29,10 +29,7 @@ class ETDEndToEnd():
         client.config_from_object('celeryconfig')
 
         base_name = self.random_digit_string()
-        # clear out any old test object
-        self.logger.info(">>> Cleanup test object")
-        # self.cleanup_test_object(base_name)
-
+  
         zipFile = "submission_999999.zip"
         newZipFile = "submission_" + base_name + ".zip"
         shutil.copyfile(f"./testdata/{zipFile}", f"./testdata/{newZipFile}")
