@@ -8,6 +8,7 @@ from app.tests.etd_dais_end_to_end import ETDDAISEndToEnd
 from app.tests.etd_alma_service_checks import ETDAlmaServiceChecks
 from app.tests.etd_alma_monitor_service_checks \
     import ETDAlmaMonitorServiceChecks
+from app.tests.etd_end_to_end import ETDEndToEnd
 
 
 def define_resources(app):
@@ -191,5 +192,20 @@ def define_resources(app):
         if len(export_result["tests_failed"]) > 0:
             result["tests_failed"].append(export_result["tests_failed"])
         result["info"] = result["info"] | export_result["info"]
+
+        return json.dumps(result)
+
+    @app.route('/etd_end_to_end')
+    def etd_end_to_end():
+        result = {"num_failed": 0,
+                  "tests_failed": [], "info": {}}
+
+        etd_end_to_end = ETDEndToEnd()
+        end_to_end_result = etd_end_to_end \
+            .end_to_end()
+        result["num_failed"] = end_to_end_result["num_failed"]
+        if len(end_to_end_result["tests_failed"]) > 0:
+            result["tests_failed"].append(end_to_end_result["tests_failed"])
+        result["info"] = result["info"] | end_to_end_result["info"]
 
         return json.dumps(result)
