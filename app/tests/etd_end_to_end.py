@@ -29,7 +29,7 @@ class ETDEndToEnd():
         client.config_from_object('celeryconfig')
 
         base_name = self.random_digit_string()
-  
+
         zipFile = "submission_999999.zip"
         newZipFile = "submission_" + base_name + ".zip"
         shutil.copyfile(f"./testdata/{zipFile}", f"./testdata/{newZipFile}")
