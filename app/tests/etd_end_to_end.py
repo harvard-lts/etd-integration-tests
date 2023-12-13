@@ -147,7 +147,8 @@ class ETDEndToEnd():
         remoteUser = os.getenv("dropboxUser")
         archiveDir = "archives/gsd"
         incomingDir = "incoming/gsd"
-        self.logger.debug(">>> Test object name: {}".format(submission_zip_object))
+        self.logger.debug(">>> Test object name: {}".
+                          format(submission_zip_object))
         with pysftp.Connection(host=remoteSite,
                                username=remoteUser,
                                private_key=private_key) as sftp:
@@ -180,7 +181,7 @@ class ETDEndToEnd():
 
         count = len(json.loads(resp_text))
         return count
-    
+
     def replace_pq_id(self, new_pq_id, submission_file_path):
         # Unzip
         directory_to_extract_to = os.path.join(os.path.dirname(submission_file_path), 'extracted')
@@ -193,15 +194,16 @@ class ETDEndToEnd():
         metsroot = tree.getroot()
 
         namespaces = {'dim': 'http://www.dspace.org/xmlns/dspace/dim'}
-        metsroot.find(".//dim:field[@mdschema='dc'][@element='identifier'][@qualifier='other']", namespaces).text = new_pq_id
+        metsroot.find(".//dim:field[@mdschema='dc'][@element='identifier'][@qualifier='other']", namespaces).text = new_pq_id # noqa
         tree.write(mets_path)
 
         # Delete submission zip
         os.remove(submission_file_path)
 
-        # Zip 
+        # Zip
         with zipfile.ZipFile(submission_file_path, mode="w") as archive:
             for file in os.listdir(directory_to_extract_to):
-                archive.write(os.path.join(directory_to_extract_to, file), file)
+                archive.write(os.path.join(directory_to_extract_to, 
+                                           file), file)
         # Delete extracted directory
         shutil.rmtree(directory_to_extract_to)
