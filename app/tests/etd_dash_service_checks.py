@@ -291,7 +291,7 @@ class ETDDashServiceChecks():
             files = sftp.listdir(dupe_dir)
             # Check if any file matches the specified pattern
             for file_name in files:
-                if file_pattern.match(file_pattern):
+                if file_pattern.match(file_name):
                     return True  # File with the pattern exists
 
         return False  # No file with the pattern found
