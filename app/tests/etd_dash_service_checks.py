@@ -9,6 +9,7 @@ import requests
 import random
 import string
 import logging
+import re
 
 
 class ETDDashServiceChecks():
@@ -151,6 +152,35 @@ class ETDDashServiceChecks():
                                        " Found: " +
                                        str(out_dir_count)}}
 
+                # Upload the test object one more time, using the same name
+                # as before. This time it should be moved to the dupe dir
+                # on the dropbox, instead of the archive dir (because it's
+                # already in the archive dir).
+                try:
+                    self.logger.info(">>> SFTP duplicate test object, again")
+                    self.sftp_test_object(base_name)
+                except Exception as err:
+                    result["num_failed"] += 1
+                    result["tests_failed"].append("SFTP")
+                    result["info"] = {"Proquest Dropbox sftp failed":
+                                      {"status_code": 500,
+                                       "text": str(err)}}
+                    self.logger.error(str(err))
+                client.send_task(name="etd-dash-service.tasks.send_to_dash",
+                                 args=[message], kwargs={},
+                                 queue=incoming_queue)
+                time.sleep(sleep_secs)  # wait for queue
+                # make sure the submission file is in the dupe dir
+                if not self.sftp_check_for_dupe(base_name):
+                    result["num_failed"] += 1
+                    result["tests_failed"].append("DASH_DUPE")
+                    result["info"] = {"DASH archive to dupe dropbox directory\
+                                      failed":
+                                      {"status_code": 500,
+                                       "text":
+                                       "Dupe dropbox directory not found."
+                                       }}
+
                 # 10. delete the test object from dash
                 self.logger.info(">>> Delete duplicate test object from dash")
                 resp_text = self.get_dash_object()
@@ -245,6 +275,26 @@ class ETDDashServiceChecks():
                          f"{incomingDir}/{newZipFile}")
             except Exception as err:
                 self.logger.error(f"SFTP error: {err}")
+
+    def sftp_check_for_dupe(self, base_name):
+        # proquest2dash test vars
+        private_key = os.getenv("PRIVATE_KEY_PATH")
+        remoteSite = os.getenv("dropboxServer")
+        remoteUser = os.getenv("dropboxUser")
+        dupe_dir = "dupe/gsd"
+        file_pattern = re.compile(r'^submission_' + base_name
+                                  + r'_\d{14}\.zip$')
+        with pysftp.Connection(host=remoteSite,
+                               username=remoteUser,
+                               private_key=private_key) as sftp:
+            # List files in the remote directory
+            files = sftp.listdir(dupe_dir)
+            # Check if any file matches the specified pattern
+            for file_name in files:
+                if file_pattern.match(file_pattern):
+                    return True  # File with the pattern exists
+
+        return False  # No file with the pattern found
 
     # Method to return a random string of 10 digits
     def random_digit_string(self):
