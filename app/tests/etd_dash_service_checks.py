@@ -183,6 +183,22 @@ class ETDDashServiceChecks():
                 self.logger.info(">>> Clean up duplicate test object")
                 self.cleanup_test_object(base_name)
 
+                # 12. Test that duplicate submission is moved to the dupe dir.
+                # Upload the test object one more time, using the same name
+                # as before. This time it should be moved to the dupe dir
+                # on the dropbox, instead of the archive dir (because it's
+                # already in the archive dir).
+                try:
+                    self.logger.info(">>> SFTP duplicate test object, again")
+                    self.sftp_test_object(base_name)
+                except Exception as err:
+                    result["num_failed"] += 1
+                    result["tests_failed"].append("SFTP")
+                    result["info"] = {"Proquest Dropbox sftp failed":
+                                      {"status_code": 500,
+                                       "text": str(err)}}
+                    self.logger.error(str(err))
+
             else:
                 client.send_task(name="etd-dash-service.tasks.send_to_dash",
                                  args=[message], kwargs={},
