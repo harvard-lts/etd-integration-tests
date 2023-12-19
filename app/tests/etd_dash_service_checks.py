@@ -237,7 +237,7 @@ class ETDDashServiceChecks():
                     "DASH_OBJECT_NOT_DELETED",
                     "Test object not deleted from dash",
                     result)
-    
+
                 # cleanup the test object from the filesystem
                 self.logger.info(">>> Clean up duplicate test object, again.")
                 self.cleanup_test_object(base_name)
