@@ -199,6 +199,42 @@ class ETDDashServiceChecks():
                                        "text": str(err)}}
                     self.logger.error(str(err))
 
+                client.send_task(name="etd-dash-service.tasks.send_to_dash",
+                                 args=[message], kwargs={},
+                                 queue=incoming_queue)
+                time.sleep(sleep_secs)  # wait for queue
+
+                client.send_task(name="etd-dash-service.tasks.send_to_dash",
+                                 args=[message], kwargs={},
+                                 queue=incoming_queue)
+                time.sleep(sleep_secs)  # wait for queue
+
+                # 13. cleanup the test object from the filesystem, again.
+                self.logger.info((">>> Delete duplicate test object "
+                                  "from dash, again"))
+                resp_text = self.get_dash_object()
+                if resp_text != "[]":
+                    uuid = json.loads(resp_text)[0]["uuid"]
+                    url = f"{rest_url}/items/{uuid}"
+                    session_key = self.get_session_key()
+                    headers = {'Cookie': f'JSESSIONID={session_key}'}
+                    response = requests.delete(url, headers=headers,
+                                               verify=False)
+                    if response.status_code != 200:
+                        result["num_failed"] += 1
+                        result["tests_failed"].append("DASH")
+                        result["info"] = {"DASH delete failed":
+                                          {"status_code": response.status_code,
+                                           "url": url,
+                                           "uuid": uuid,
+                                           "session_key": session_key,
+                                           "text": "Delete failed"}}
+                        self.logger.error("Delete failed: " + response.text)
+
+                # cleanup the test object from the filesystem
+                self.logger.info(">>> Clean up duplicate test object, again.")
+                self.cleanup_test_object(base_name)
+
             else:
                 client.send_task(name="etd-dash-service.tasks.send_to_dash",
                                  args=[message], kwargs={},
