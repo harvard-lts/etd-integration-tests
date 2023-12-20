@@ -9,6 +9,7 @@ import requests
 import random
 import string
 import logging
+import re
 
 
 class ETDDashServiceChecks():
@@ -204,10 +205,16 @@ class ETDDashServiceChecks():
                                  queue=incoming_queue)
                 time.sleep(sleep_secs)  # wait for queue
 
-                client.send_task(name="etd-dash-service.tasks.send_to_dash",
-                                 args=[message], kwargs={},
-                                 queue=incoming_queue)
-                time.sleep(sleep_secs)  # wait for queue
+                # make sure the submission file is in the dupe dir
+                if not self.sftp_check_for_dupe(base_name):
+                    result["num_failed"] += 1
+                    result["tests_failed"].append("DASH_DUPE")
+                    result["info"] = {("DASH archive to dupe dropbox "
+                                      "directory failed"):
+                                      {"status_code": 500,
+                                       "text":
+                                       "Dupe dropbox directory not found."
+                                       }}
 
                 # 13. cleanup the test object from the filesystem, again.
                 self.logger.info((">>> Delete duplicate test object "
