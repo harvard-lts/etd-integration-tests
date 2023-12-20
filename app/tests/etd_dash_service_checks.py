@@ -312,6 +312,26 @@ class ETDDashServiceChecks():
             except Exception as err:
                 self.logger.error(f"SFTP error: {err}")
 
+    def sftp_check_for_dupe(self, base_name):
+        # proquest2dash test vars
+        private_key = os.getenv("PRIVATE_KEY_PATH")
+        remoteSite = os.getenv("dropboxServer")
+        remoteUser = os.getenv("dropboxUser")
+        dupe_dir = "dupe/gsd"
+        file_pattern = re.compile(r'^submission_' + base_name
+                                  + r'_\d{14}\.zip$')
+        with pysftp.Connection(host=remoteSite,
+                               username=remoteUser,
+                               private_key=private_key) as sftp:
+            # List files in the remote directory
+            files = sftp.listdir(dupe_dir)
+            # Check if any file matches the specified pattern
+            for file_name in files:
+                if file_pattern.match(file_name):
+                    return True  # File with the pattern exists
+
+        return False  # No file with the pattern found
+
     # Method to return a random string of 10 digits
     def random_digit_string(self):
         return ''.join(random.choices(string.digits, k=10))
