@@ -82,15 +82,24 @@ def define_resources(app):
         # been updated in the services yet.
         res1 = connectivity()
         res2 = etd_dash_service_testing()
+        res3 = etd_alma_service_testing()
+        res4 = etd_alma_monitor_service_testing()
         res1_json = json.loads(res1)
         res2_json = json.loads(res2)
+        res3_json = json.loads(res3)
+        res4_json = json.loads(res4)
         result["num_failed"] = res1_json["num_failed"] \
-            + res2_json["num_failed"]
+            + res2_json["num_failed"] + res3_json["num_failed"]
         if len(res1_json["tests_failed"]) > 0:
             result["tests_failed"].append(res1_json["tests_failed"])
         if len(res2_json["tests_failed"]) > 0:
             result["tests_failed"].append(res2_json["tests_failed"])
-        result["info"] = result["info"] | res1_json["info"] | res2_json["info"]
+        if len(res3_json["tests_failed"]) > 0:
+            result["tests_failed"].append(res3_json["tests_failed"])
+        if len(res4_json["tests_failed"]) > 0:
+            result["tests_failed"].append(res4_json["tests_failed"])
+        result["info"] = result["info"] | res1_json["info"] | \
+            res2_json["info"] | res3_json["info"]
 
         return json.dumps(result)
 
