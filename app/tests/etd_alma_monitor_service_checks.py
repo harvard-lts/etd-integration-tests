@@ -112,6 +112,8 @@ class ETDAlmaMonitorServiceChecks():
             mongo_client = MongoClient(mongo_url, maxPoolSize=1)
             mongo_db = mongo_client[os.getenv("MONGO_DBNAME")]
             collection = mongo_db[os.getenv("MONGO_COLLECTION")]
+            # clean up any previous test runs
+            collection.delete_many({"proquest_id": known_pq_id})
             collection.insert_one(record)
             mongo_client.close()
         except Exception as err:
