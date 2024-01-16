@@ -25,14 +25,22 @@ class ETDAlmaMonitorServiceChecks():
             copy_result = self.__copy_test_submission(
                 zip_file,
                 directory_id)
+            # Unpack the zip file
+            unpack_result = self.__unpack_test_submission(
+                zip_file,
+                directory_id)
             mongo_result = self.__insert_alma_reccord_in_mongo(directory_id)
             self.__place_queue_message()
             result["num_failed"] = copy_result["num_failed"] + \
-                mongo_result["num_failed"]
+                mongo_result["num_failed"] + \
+                unpack_result["num_failed"]
             result["tests_failed"] = copy_result["tests_failed"]
+            result["tests_failed"].append(unpack_result["tests_failed"])
             result["tests_failed"].append(mongo_result["tests_failed"])
             result["info"] = copy_result["info"]
+            result["info"].update(unpack_result["info"])
             result["info"].update(mongo_result["info"])
+
         except Exception as e:
             self.logger.error(traceback.format_exc())
             result["num_failed"] += 1
@@ -181,3 +189,23 @@ class ETDAlmaMonitorServiceChecks():
         client.send_task(name="etd-alma-monitor-service.tasks.send_to_drs",
                          args=[message], kwargs={},
                          queue=queue)
+
+    def __unpack_test_submission(self, zip_file, test_submission_dir_name):
+        result = {"num_failed": 0,
+                  "tests_failed": [],
+                  "info": {}}
+
+        dest_dir = os.getenv("ETD_IN_DIR")
+        dest_path = os.path.join(dest_dir, test_submission_dir_name)
+        try:
+            shutil.unpack_archive(os.path.join(dest_path, zip_file),
+                                  extract_dir=dest_path)
+        except Exception as e:
+            self.logger.error(traceback.format_exc())
+            result["num_failed"] += 1
+            result["tests_failed"].append("Unpack failed with exception")
+            result["info"] = {"Unpack failed with exception":
+                              {"status_code": 500,
+                               "text": str(e)}}
+
+        return result
