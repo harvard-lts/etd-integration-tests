@@ -118,11 +118,11 @@ class ETDAlmaServiceChecks():
     def setup_test_object(self, base_name):
         if not os.path.exists('/home/etdadm/data/in/' + base_name):
             os.makedirs('/home/etdadm/data/in/' + base_name, exist_ok=True)
-        shutil.copy2('/home/etdadm/testdata/alma/in/' + base_name +
+        shutil.copy2('/home/etdadm/tests/data/in/' + base_name +
                      '/mets.xml', '/home/etdadm/data/in/' + base_name)  # noqa: E501
         if not os.path.exists('/home/etdadm/data/out/' + base_name):
             os.makedirs('/home/etdadm/data/out/' + base_name, exist_ok=True)
-        shutil.copy2('/home/etdadm/testdata/alma/out/' + base_name +
+        shutil.copy2('/home/etdadm/tests/data/out/' + base_name +
                      '/mapfile', '/home/etdadm/data/out/' + base_name)  # noqa: E501
 
     def sftp_check_export(self, base_name):
