@@ -214,7 +214,7 @@ def define_resources(app):
         result["info"] = result["info"] | end_to_end_result["info"]
 
         return json.dumps(result)
-    
+
     @app.route('/etd_end_to_end_no_dash')
     def etd_end_to_end_no_dash():
         result = {"num_failed": 0,
