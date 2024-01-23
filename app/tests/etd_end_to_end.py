@@ -17,7 +17,23 @@ class ETDEndToEnd():
     def __init__(self):
         self.logger = logging.getLogger('etd_int_tests')
 
-    def end_to_end(self):
+    def end_to_end(self, indash=True):
+        """
+            Executes the end-to-end integration test.
+
+            Args:
+                indash (bool, optional): Flag indicating whether to
+                this is an indash test.
+                    Defaults to True.
+
+            Returns:
+                dict: A dictionary containing the test result with the
+                following keys:
+                    - num_failed (int): The number of failed tests.
+                    - tests_failed (list): A list of failed test names.
+                    - info (dict): Additional information about the
+                    test result.
+        """
         self.logger.info(">>> Starting integration test")
         result = {"num_failed": 0,
                   "tests_failed": [],
@@ -30,7 +46,11 @@ class ETDEndToEnd():
 
         base_name = self.random_digit_string()
 
+        # If the test object is for indash, use this one
         zipFile = "submission_999999.zip"
+        # Otherwise use the non-dash one
+        if not indash:
+            zipFile = "submission_no_dash.zip"
         newZipFile = "submission_" + base_name + ".zip"
         shutil.copyfile(f"./testdata/{zipFile}", f"./testdata/{newZipFile}")
 
