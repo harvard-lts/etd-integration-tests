@@ -17,7 +17,23 @@ class ETDEndToEnd():
     def __init__(self):
         self.logger = logging.getLogger('etd_int_tests')
 
-    def end_to_end(self):
+    def end_to_end(self, indash=True):
+        """
+            Executes the end-to-end integration test.
+
+            Args:
+                indash (bool, optional): Flag indicating whether to
+                this is an indash test.
+                    Defaults to True.
+
+            Returns:
+                dict: A dictionary containing the test result with the
+                following keys:
+                    - num_failed (int): The number of failed tests.
+                    - tests_failed (list): A list of failed test names.
+                    - info (dict): Additional information about the
+                    test result.
+        """
         self.logger.info(">>> Starting integration test")
         result = {"num_failed": 0,
                   "tests_failed": [],
@@ -30,7 +46,13 @@ class ETDEndToEnd():
 
         base_name = self.random_digit_string()
 
+        # If the test object is for indash, use this one
         zipFile = "submission_999999.zip"
+        schoolcode = "gsd"
+        # Otherwise use the non-dash one
+        if not indash:
+            zipFile = "submission_no_dash.zip"
+            schoolcode = "college"
         newZipFile = "submission_" + base_name + ".zip"
         shutil.copyfile(f"./testdata/{zipFile}", f"./testdata/{newZipFile}")
 
@@ -38,7 +60,7 @@ class ETDEndToEnd():
         # put the test object in the dropbox
         self.logger.info(">>> SFTP test object")
         try:
-            self.sftp_test_object(newZipFile)
+            self.sftp_test_object(newZipFile, schoolcode)
         except Exception as err:
             result["num_failed"] += 1
             result["tests_failed"].append("SFTP")
@@ -82,20 +104,21 @@ class ETDEndToEnd():
         resp = requests.post(login_url, data=login_info, verify=False)
         return resp.cookies.get('JSESSIONID')
 
-    def cleanup_test_object(self, base_name):
-        if glob.glob('/home/etdadm/data/in/proquest*-' + base_name + '-gsd/submission_' + base_name + '.zip'):  # noqa: E501
-            for filename in glob.glob('/home/etdadm/data/in/proquest*-' + base_name + '-gsd/*'):  # noqa: E501
+    def cleanup_test_object(self, base_name, schoolcode="gsd"):
+        dirname = 'proquest*-' + base_name + '-' + schoolcode
+        if glob.glob('/home/etdadm/data/in/' + dirname + '/submission_' + base_name + '.zip'):  # noqa: E501
+            for filename in glob.glob('/home/etdadm/data/in/' + dirname + '/*'):  # noqa: E501
                 os.remove(filename)
-            for filename in glob.glob('/home/etdadm/data/in/proquest*-' + base_name + '-gsd'):  # noqa: E501
+            for filename in glob.glob('/home/etdadm/data/in/' + dirname):  # noqa: E501
                 shutil.rmtree(filename)
 
-    def sftp_test_object(self, submission_zip_object):
+    def sftp_test_object(self, submission_zip_object, schoolcode="gsd"):
         # proquest2dash test vars
         private_key = os.getenv("PRIVATE_KEY_PATH")
         remoteSite = os.getenv("dropboxServer")
         remoteUser = os.getenv("dropboxUser")
-        archiveDir = "archives/gsd"
-        incomingDir = "incoming/gsd"
+        archiveDir = "archives/" + schoolcode
+        incomingDir = "incoming/" + schoolcode
         self.logger.debug(">>> Test object name: {}".
                           format(submission_zip_object))
         with pysftp.Connection(host=remoteSite,
