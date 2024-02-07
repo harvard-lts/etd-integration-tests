@@ -309,6 +309,10 @@ class ETDDashServiceChecks():
             try:
                 sftp.put(f"./testdata/{zipFile}",
                          f"{incomingDir}/{newZipFile}")
+                if sftp.exists(f"{incomingDir}/{newZipFile}"):
+                    self.logger.info(f"Test object sftp'd to {incomingDir}")
+                else:
+                    raise Exception(f"Test object not sftp'd to {incomingDir}")
             except Exception as err:
                 self.logger.error(f"SFTP error: {err}")
 
