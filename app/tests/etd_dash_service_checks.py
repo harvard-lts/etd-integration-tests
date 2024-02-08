@@ -258,8 +258,8 @@ class ETDDashServiceChecks():
                     self.logger.info("Test object sftp'd to "
                                      f"{incomingDir}/{newZipFile}")
                 else:
-                    raise Exception(f"Test object not sftp'd to \
-                                    {incomingDir}/{newZipFile}")
+                    raise Exception("Test object not sftp'd to "
+                                    f"{incomingDir}/{newZipFile}")
             except Exception as err:
                 self.logger.error(f"SFTP error: {err}")
 
