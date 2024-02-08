@@ -43,39 +43,12 @@ class ETDDashServiceChecks():
             if (DASH_FEATURE_FLAG in feature_flags and
                     feature_flags[DASH_FEATURE_FLAG] == "on"):
 
-                rest_url = os.getenv("DASH_REST_URL")
                 base_name = self.random_digit_string()
                 # 1. clear out any old test object
                 self.logger.info(">>> Cleanup test object")
                 self.cleanup_test_object(base_name)
-
                 self.logger.info(">>> Clear any old test object from dash")
-                resp_text = self.get_dash_object()
-                if resp_text != "[]":
-                    self.logger.info(">>> Old test object found. Proceeding to delete.")  # noqa: E501
-                    uuid = json.loads(resp_text)[0]["uuid"]
-                    url = f"{rest_url}/items/{uuid}"
-                    session_key = self.get_session_key()
-                    headers = {'Cookie': f'JSESSIONID={session_key}'}
-                    response = requests.delete(url, headers=headers,
-                                               verify=False)
-
-                    if response.status_code != 200:
-                        result["num_failed"] += 1
-                        result["tests_failed"].append("DASH")
-                        result["info"] = {"DASH delete failed":
-                                          {"status_code": response.status_code,
-                                           "url": url,
-                                           "uuid": uuid,
-                                           "session_key": session_key,
-                                           "text": "Delete failed"}}
-                        self.logger.error("Delete failed: " + response.text)
-
-                # verify that the test object is not already in dash
-                self.verify_submission_count(0,
-                                             "DASH_OBJECT_EXISTS",
-                                             "Test object is already in dash",
-                                             result)
+                self.delete_dash_object(result)
 
                 # 2. put the test object in the dropbox
                 self.logger.info(">>> SFTP test object")
@@ -97,9 +70,8 @@ class ETDDashServiceChecks():
                 sleep_secs = int(os.environ.get('SLEEP_SECS', 30))
                 time.sleep(sleep_secs)  # wait for queue
 
-                self.logger.info(">>> Check dash for test object")
-
                 # 4. count should be 1, shows insertion into dash
+                self.logger.info(">>> Check dash for test object")
                 self.verify_submission_count(1,
                                              "DASH",
                                              "Dash count is not 1",
@@ -176,31 +148,7 @@ class ETDDashServiceChecks():
 
                 # 10. delete the test object from dash
                 self.logger.info(">>> Delete duplicate test object from dash")
-                resp_text = self.get_dash_object()
-                if resp_text != "[]":
-                    uuid = json.loads(resp_text)[0]["uuid"]
-                    url = f"{rest_url}/items/{uuid}"
-                    session_key = self.get_session_key()
-                    headers = {'Cookie': f'JSESSIONID={session_key}'}
-                    response = requests.delete(url, headers=headers,
-                                               verify=False)
-
-                    if response.status_code != 200:
-                        result["num_failed"] += 1
-                        result["tests_failed"].append("DASH")
-                        result["info"] = {"DASH delete failed":
-                                          {"status_code": response.status_code,
-                                           "url": url,
-                                           "uuid": uuid,
-                                           "session_key": session_key,
-                                           "text": "Delete failed"}}
-                        self.logger.error("Delete failed: " + response.text)
-
-                # verify that the test object is no longer in dash
-                self.verify_submission_count(0,
-                                             "DASH_OBJECT_NOT_DELETED",
-                                             "Test object not deleted from dash",  # noqa: E501
-                                             result)
+                self.delete_dash_object(result)
 
                 # 11. cleanup the test object from the filesystem
                 self.logger.info(">>> Clean up duplicate test object")
@@ -241,32 +189,7 @@ class ETDDashServiceChecks():
                 # 13. cleanup the test object from the filesystem, again.
                 self.logger.info((">>> Delete duplicate test object "
                                   "from dash, again"))
-                resp_text = self.get_dash_object()
-                if resp_text != "[]":
-                    uuid = json.loads(resp_text)[0]["uuid"]
-                    url = f"{rest_url}/items/{uuid}"
-                    session_key = self.get_session_key()
-                    headers = {'Cookie': f'JSESSIONID={session_key}'}
-                    response = requests.delete(url, headers=headers,
-                                               verify=False)
-                    if response.status_code != 200:
-                        result["num_failed"] += 1
-                        result["tests_failed"].append("DASH")
-                        result["info"] = {"DASH delete failed":
-                                          {"status_code": response.status_code,
-                                           "url": url,
-                                           "uuid": uuid,
-                                           "session_key": session_key,
-                                           "text": "Delete failed"}}
-                        self.logger.error("Delete failed: " + response.text)
-
-                # verify that the test object is no longer in dash
-                self.verify_submission_count(
-                    0,
-                    "DASH_OBJECT_NOT_DELETED",
-                    "Test object not deleted from dash",
-                    result)
-
+                self.delete_dash_object(result)
                 # cleanup the test object from the filesystem
                 self.logger.info(">>> Clean up duplicate test object, again.")
                 self.cleanup_test_object(base_name)
@@ -332,8 +255,8 @@ class ETDDashServiceChecks():
                 sftp.put(f"./testdata/{zipFile}",
                          f"{incomingDir}/{newZipFile}")
                 if sftp.exists(f"{incomingDir}/{newZipFile}"):
-                    self.logger.info(f"Test object sftp'd to \
-                                     {incomingDir}/{newZipFile}")
+                    self.logger.info("Test object sftp'd to "
+                                     f"{incomingDir}/{newZipFile}")
                 else:
                     raise Exception(f"Test object not sftp'd to \
                                     {incomingDir}/{newZipFile}")
@@ -436,3 +359,35 @@ class ETDDashServiceChecks():
             self.logger.error(error_msg)
             raise Exception(error_msg)
         return count
+
+    # Delete the test object from dash
+    def delete_dash_object(self, result):
+        self.logger.info("Deleting test object from dash")
+        rest_url = os.getenv("DASH_REST_URL")
+        resp_text = self.get_dash_object()
+        if resp_text != "[]":
+            self.logger.info("Test object found. Proceeding to delete.")
+            uuid = json.loads(resp_text)[0]["uuid"]
+            url = f"{rest_url}/items/{uuid}"
+            session_key = self.get_session_key()
+            headers = {'Cookie': f'JSESSIONID={session_key}'}
+            response = requests.delete(url, headers=headers, verify=False)
+
+            if response.status_code != 200:
+                result["num_failed"] += 1
+                result["tests_failed"].append("DASH")
+                result["info"] = {"DASH delete failed":
+                                  {"status_code": response.status_code,
+                                   "url": url,
+                                   "uuid": uuid,
+                                   "session_key": session_key,
+                                   "text": "Delete failed"}}
+                self.logger.error("Delete failed: " + response.text)
+        else:
+            self.logger.info("Test object not found in dash.")
+
+        # verify that the test object is no longer in dash
+        self.verify_submission_count(0,
+                                     "DASH_OBJECT_NOT_DELETED",
+                                     "Test object not deleted from dash",
+                                     result)
