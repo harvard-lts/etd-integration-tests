@@ -43,10 +43,33 @@ class ETDDashServiceChecks():
             if (DASH_FEATURE_FLAG in feature_flags and
                     feature_flags[DASH_FEATURE_FLAG] == "on"):
 
+                rest_url = os.getenv("DASH_REST_URL")
                 base_name = self.random_digit_string()
                 # 1. clear out any old test object
                 self.logger.info(">>> Cleanup test object")
                 self.cleanup_test_object(base_name)
+
+                self.logger.info(">>> Clear any old test object from dash")
+                resp_text = self.get_dash_object()
+                if resp_text != "[]":
+                    self.logger.info(">>> Old test object found. Proceeding to delete.")  # noqa: E501
+                    uuid = json.loads(resp_text)[0]["uuid"]
+                    url = f"{rest_url}/items/{uuid}"
+                    session_key = self.get_session_key()
+                    headers = {'Cookie': f'JSESSIONID={session_key}'}
+                    response = requests.delete(url, headers=headers,
+                                               verify=False)
+
+                    if response.status_code != 200:
+                        result["num_failed"] += 1
+                        result["tests_failed"].append("DASH")
+                        result["info"] = {"DASH delete failed":
+                                          {"status_code": response.status_code,
+                                           "url": url,
+                                           "uuid": uuid,
+                                           "session_key": session_key,
+                                           "text": "Delete failed"}}
+                        self.logger.error("Delete failed: " + response.text)
 
                 # verify that the test object is not already in dash
                 self.verify_submission_count(0,
@@ -74,7 +97,6 @@ class ETDDashServiceChecks():
                 sleep_secs = int(os.environ.get('SLEEP_SECS', 30))
                 time.sleep(sleep_secs)  # wait for queue
 
-                rest_url = os.getenv("DASH_REST_URL")
                 self.logger.info(">>> Check dash for test object")
 
                 # 4. count should be 1, shows insertion into dash
@@ -412,4 +434,5 @@ class ETDDashServiceChecks():
                                "count": count,
                                "text": resp_text}}
             self.logger.error(error_msg)
+            raise Exception(error_msg)
         return count
