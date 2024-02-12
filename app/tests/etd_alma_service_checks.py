@@ -120,10 +120,16 @@ class ETDAlmaServiceChecks():
             os.makedirs('/home/etdadm/data/in/' + base_name, exist_ok=True)
         shutil.copy2('/home/etdadm/testdata/alma/in/' + base_name +
                      '/mets.xml', '/home/etdadm/data/in/' + base_name)  # noqa: E501
+        if not os.path.exists('/home/etdadm/data/in/' + base_name +
+                              '/mets.xml'):
+            self.logger.error("Setup test object failed. mets.xml not found")
         if not os.path.exists('/home/etdadm/data/out/' + base_name):
             os.makedirs('/home/etdadm/data/out/' + base_name, exist_ok=True)
         shutil.copy2('/home/etdadm/testdata/alma/out/' + base_name +
                      '/mapfile', '/home/etdadm/data/out/' + base_name)  # noqa: E501
+        if not os.path.exists('/home/etdadm/data/out/' + base_name +
+                              '/mapfile'):
+            self.logger.error("Setup test object failed. mapfile not found")
 
     def sftp_check_export(self, base_name):
         # alma service test vars
