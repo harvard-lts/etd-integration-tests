@@ -116,6 +116,7 @@ class ETDAlmaServiceChecks():
                 shutil.rmtree(filename)
 
     def setup_test_object(self, base_name):
+        self.logger.info(">>> Setup test object: " + base_name)
         if not os.path.exists('/home/etdadm/data/in/' + base_name):
             os.makedirs('/home/etdadm/data/in/' + base_name, exist_ok=True)
         shutil.copy2('/home/etdadm/testdata/alma/in/' + base_name +
