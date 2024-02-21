@@ -347,7 +347,11 @@ class ETDDashServiceChecks():
         resp_text = self.get_dash_object()
         self.logger.debug(">>> Dash object: " + resp_text)
 
-        count = len(json.loads(resp_text))
+        count = 0
+        trials = 0
+        max_trials = os.getenv("MAX_TRIALS", 10)
+        while count != expected_count and trials < max_trials:
+            count = len(json.loads(resp_text))
         if count != expected_count:
             result["num_failed"] += 1
             result["tests_failed"].append(error_name)
