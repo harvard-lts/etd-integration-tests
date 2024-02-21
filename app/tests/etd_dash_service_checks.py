@@ -356,6 +356,7 @@ class ETDDashServiceChecks():
                                number {}: {}"
                               .format(trials, resp_text))
             count = len(json.loads(resp_text))
+            trials += 1
         if count != expected_count:
             result["num_failed"] += 1
             result["tests_failed"].append(error_name)
