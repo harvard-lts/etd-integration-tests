@@ -350,6 +350,7 @@ class ETDDashServiceChecks():
         count = 0
         trials = 0
         max_trials = os.getenv("MAX_TRIALS", 10)
+        sleep_secs = os.getenv("SLEEP_SECS", 30)
         while count != expected_count and trials < max_trials:
             resp_text = self.get_dash_object()
             self.logger.debug(">>> Attempting to retrieve Dash object trial \
@@ -357,6 +358,7 @@ class ETDDashServiceChecks():
                               .format(trials, resp_text))
             count = len(json.loads(resp_text))
             trials += 1
+            time.sleep(sleep_secs)
         if count != expected_count:
             result["num_failed"] += 1
             result["tests_failed"].append(error_name)
