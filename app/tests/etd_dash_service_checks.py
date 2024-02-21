@@ -350,7 +350,7 @@ class ETDDashServiceChecks():
         count = 0
         trials = 0
         max_trials = os.getenv("MAX_TRIALS", 10)
-        sleep_secs = os.getenv("SLEEP_SECS", 30)
+        sleep_secs = int(os.getenv("SLEEP_SECS", 30))
         while count != expected_count and trials < max_trials:
             resp_text = self.get_dash_object()
             self.logger.debug(">>> Attempting to retrieve Dash object trial \
