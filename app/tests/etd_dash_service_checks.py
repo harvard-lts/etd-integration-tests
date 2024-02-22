@@ -175,8 +175,19 @@ class ETDDashServiceChecks():
                                  queue=incoming_queue)
                 time.sleep(sleep_secs)  # wait for queue
 
+                trials = 0
+                max_trials = os.getenv("MAX_TRIALS", 10)
+                sleep_secs = int(os.getenv("SLEEP_SECS", 30))
+                check_for_dupe = self.sftp_check_for_dupe(base_name)
+                while not check_for_dupe and trials < max_trials:
+                    self.logger.debug(">>> Attempting to check for dupes \
+                                    trial number {}".format(trials))
+                    check_for_dupe = self.sftp_check_for_dupe(base_name)
+                    trials += 1
+                    time.sleep(sleep_secs)
+
                 # make sure the submission file is in the dupe dir
-                if not self.sftp_check_for_dupe(base_name):
+                if not check_for_dupe:
                     result["num_failed"] += 1
                     result["tests_failed"].append("DASH_DUPE")
                     result["info"] = {("DASH archive to dupe dropbox "
