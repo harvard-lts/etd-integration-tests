@@ -173,8 +173,7 @@ class ETDAlmaMonitorServiceChecks():
             {
                 "dash_feature_flag": "on",
                 "alma_feature_flag": "on",
-                "send_to_drs_feature_flag": "on",
-                "drs_holding_record_feature_flag": "off"
+                "send_to_drs_feature_flag": "on"
             }
         }
         queue = os.getenv("ALMA_MONITOR_SERVICE_QUEUE_NAME")
